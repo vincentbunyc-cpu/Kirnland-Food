@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>HF Foods Atlanta</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;background:#f0fdf4;color:#222;font-size:13px}
+body{padding-bottom:70px}
+.hdr{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid #e5e7eb;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.hdr img{height:32px}
+.hdr h1{font-size:15px;font-weight:700;color:#16a34a;flex:1;line-height:1.2}
+.hdr h1 small{display:block;font-size:10px;color:#666;font-weight:400;margin-top:1px}
+.lang-link{display:inline-flex;align-items:center;gap:3px;padding:5px 10px;border:1px solid #16a34a;border-radius:6px;background:#fff;color:#16a34a;font-size:11px;font-weight:600;text-decoration:none;flex-shrink:0;cursor:pointer}
+.lang-link:active{background:#16a34a;color:#fff}
+.srch{padding:8px 12px;background:#fff;border-bottom:1px solid #e5e7eb}
+.srch input{width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;outline:none;background:#f0fdf4}
+.srch input:focus{border-color:#16a34a;background:#fff}
+.tabs{display:flex;gap:4px;padding:8px 12px;background:#fff;border-bottom:1px solid #e5e7eb;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:5px 10px;border:1px solid #d1d5db;border-radius:14px;background:#fff;font-size:12px;color:#444;cursor:pointer;flex-shrink:0;user-select:none}
+.tab.on{background:#16a34a;color:#fff;border-color:#16a34a}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:8px}
+@media(min-width:480px){.pgrid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:640px){.pgrid{grid-template-columns:repeat(6,1fr)}}
+@media(min-width:900px){.pgrid{grid-template-columns:repeat(8,1fr)}}
+@media(min-width:1200px){.pgrid{grid-template-columns:repeat(9,1fr)}}
+.pc{background:#fff;border:1px solid #e5e7eb;border-radius:6px;padding:6px;display:flex;flex-direction:column;gap:3px;position:relative;min-height:80px}
+.pc.oos{background:#f3f4f6;opacity:.68}
+.pc-code{font-size:9px;color:#16a34a;font-weight:700;font-family:"SF Mono",Menlo,Consolas,monospace;letter-spacing:.3px;line-height:1}
+.pc-name{font-size:11px;line-height:1.3;color:#222;font-weight:500;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:28px;word-break:break-word}
+.pc-unit{font-size:9px;color:#777}
+.pc-stock{font-size:9px;color:#16a34a;font-weight:600}
+.pc-stock.low{color:#d97706}
+.pc-stock.oos{color:#dc2626}
+.pc-oos-badge{position:absolute;top:3px;right:3px;background:#dc2626;color:#fff;font-size:8px;padding:1px 4px;border-radius:3px;font-weight:700;letter-spacing:.3px}
+.qty-row{display:flex;align-items:center;justify-content:space-between;gap:2px;margin-top:auto}
+.qty-btn{width:22px;height:22px;border:1px solid #16a34a;background:#fff;color:#16a34a;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1}
+.qty-btn:active{background:#16a34a;color:#fff}
+.qty-btn.disabled{border-color:#ccc;color:#ccc;background:#f3f4f6;cursor:not-allowed}
+.qty-val{flex:1;text-align:center;font-size:13px;font-weight:700;color:#16a34a}
+.qty-val.zero{color:#999;font-weight:400}
+.cartbar{position:fixed;bottom:0;left:0;right:0;background:#16a34a;color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 -2px 8px rgba(0,0,0,.15);z-index:99;cursor:pointer}
+.cart-info{display:flex;align-items:center;gap:8px}
+.cart-icon{font-size:18px}
+.cart-txt{font-size:13px;font-weight:600}
+.cart-co{background:#fff;color:#16a34a;padding:6px 14px;border-radius:6px;font-size:13px;font-weight:700;border:none;cursor:pointer}
+.cart-co:disabled{opacity:.5}
+/* Modal */
+.mskin{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.mskin.show{display:flex}
+.mbox{background:#fff;width:100%;max-width:600px;max-height:88vh;border-radius:12px 12px 0 0;display:flex;flex-direction:column;overflow:hidden;animation:slideup .22s}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.mhdr{padding:12px 16px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;background:#fff}
+.mhdr h3{font-size:15px;font-weight:700}
+.mclose{font-size:22px;color:#666;cursor:pointer;background:none;border:none;padding:0;line-height:1}
+.mbody{padding:12px 16px;overflow-y:auto;flex:1}
+.mfoot{padding:10px 16px;border-top:1px solid #e5e7eb;background:#fff}
+/* Cart list */
+.ci-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f1f5f9;font-size:12px}
+.ci-row:last-child{border-bottom:none}
+.ci-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ci-unit{color:#777;font-size:10px}
+.ci-qty{display:flex;align-items:center;gap:3px}
+.ci-del{background:none;border:none;color:#dc2626;font-size:14px;cursor:pointer;padding:2px 4px}
+/* Form */
+.form-row{margin-bottom:10px}
+.form-row label{display:block;font-size:11px;color:#555;margin-bottom:3px;font-weight:600}
+.form-row label .req{color:#dc2626}
+.form-row input,.form-row textarea{width:100%;padding:7px 9px;border:1px solid #d1d5db;border-radius:5px;font-size:13px;outline:none;background:#fff;font-family:inherit}
+.form-row input:focus,.form-row textarea:focus{border-color:#16a34a}
+.form-row textarea{resize:vertical;min-height:50px}
+.method-opts{display:flex;gap:8px;margin-top:2px}
+.m-opt{flex:1;display:flex;align-items:center;gap:6px;padding:9px 10px;border:1px solid #d1d5db;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;font-weight:500;color:#444;user-select:none}
+.m-opt input[type=radio]{accent-color:#16a34a;cursor:pointer;flex-shrink:0;margin:0;width:16px;height:16px}
+.m-opt.active{border-color:#16a34a;background:#f0fdf4;color:#16a34a;font-weight:600}
+.m-hint{margin-top:6px;padding:6px 9px;border-radius:5px;font-size:11px;line-height:1.4;display:none}
+.m-hint.show{display:block}
+.m-hint.pickup{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+.m-hint.delivery{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.lookup-box{display:flex;gap:6px}
+.lookup-box input{flex:1}
+.lookup-box button{padding:7px 12px;background:#16a34a;color:#fff;border:none;border-radius:5px;font-size:12px;cursor:pointer;white-space:nowrap}
+.cust-card{margin-top:6px;padding:6px 8px;background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;font-size:11px;color:#075985;display:none}
+.cust-card.show{display:block}
+.btn-send{width:100%;padding:12px;background:#16a34a;color:#fff;border:none;border-radius:6px;font-size:15px;font-weight:700;cursor:pointer}
+.btn-send:disabled{opacity:.55}
+.msg{padding:8px;border-radius:5px;font-size:12px;margin-bottom:8px;display:none}
+.msg.show{display:block}
+.msg.err{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.msg.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.empty{text-align:center;color:#888;padding:30px;font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAIAAADYYG7QAAAAjklEQVR42u3ZyQ2AQAxDUVdBUbRJoXBFwyIjlMQBj1LAOyZ/sIo9GBQDmpaZmXAQ6XgjQzTlKQtpGtKETA1jQiaFYaFEc2NqAkrQXJlQqDk1oVZzNGmDSjSDySAeVKjZmwwyyCCDDDLoOyCvHx1BXvIJkNxdpni5OjY07UOKBU20MSpWWMVOLVry//j5sgEBGDdYfvoXUQAAAABJRU5ErkJggg==" alt="logo">
+  <h1 id="titleMain">HF Foods Atlanta</h1>
+  <a class="lang-link" href="en.html">🌐 English</a>
+</div>
+
+<div class="srch">
+  <input type="search" id="sq" placeholder="搜索产品 / Search products">
+</div>
+
+<div class="tabs" id="tabs"></div>
+
+<div id="list"></div>
+
+<div class="cartbar" id="cartbar" onclick="openCart()">
+  <div class="cart-info">
+    <span class="cart-icon">🛒</span>
+    <span class="cart-txt" id="cartTxt">购物车 / Cart: 0</span>
+  </div>
+  <button class="cart-co" onclick="event.stopPropagation();checkout()" id="coBtn">发送 / Send</button>
+</div>
+
+<!-- Cart Modal -->
+<div class="mskin" id="mCart">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3 id="mCartTitle">购物车 / Cart</h3>
+      <button class="mclose" onclick="closeModal('mCart')">&times;</button>
+    </div>
+    <div class="mbody" id="mCartBody"></div>
+    <div class="mfoot">
+      <button class="btn-send" onclick="checkout()" id="mCartCheckout">去结账 / Checkout</button>
+    </div>
+  </div>
+</div>
+
+<!-- Checkout Modal -->
+<div class="mskin" id="mCo">
+  <div class="mbox">
+    <div class="mhdr">
+      <h3 id="mCoTitle">结账 / Checkout</h3>
+      <button class="mclose" onclick="closeModal('mCo')">&times;</button>
+    </div>
+    <div class="mbody">
+      <div class="msg err" id="msgErr"></div>
+      <div class="msg ok" id="msgOk"></div>
+
+      <div class="form-row">
+        <label id="labMethod">取货方式 <span class="req">*</span> / Order Type <span class="req">*</span></label>
+        <div class="method-opts">
+          <label class="m-opt" id="optPickupBox"><input type="radio" name="fmethod" value="pickup" onchange="onMethodChange()"> <span id="optPickup">自取 / Pickup</span></label>
+          <label class="m-opt" id="optDeliveryBox"><input type="radio" name="fmethod" value="delivery" onchange="onMethodChange()"> <span id="optDelivery">送货 / Delivery</span></label>
+        </div>
+        <div class="m-hint" id="methodHint"></div>
+      </div>
+
+      <div class="form-row">
+        <label id="labId">客户编号（可选） / Customer ID (optional)</label>
+        <input type="text" id="fid" placeholder="输入编号 / Enter ID">
+      </div>
+
+      <div class="form-row">
+        <label id="labName">餐馆名称 <span class="req">*</span> / Restaurant Name <span class="req">*</span></label>
+        <input type="text" id="fname" required>
+      </div>
+      <div class="form-row">
+        <label id="labPhone">联系电话 <span class="req">*</span> / Phone <span class="req">*</span></label>
+        <input type="tel" id="fphone" inputmode="numeric" maxlength="14" placeholder="10 位数字 / 10 digits" required>
+      </div>
+      <div class="form-row">
+        <label id="labContact">联系人 <span class="req">*</span> / Contact Person <span class="req">*</span></label>
+        <input type="text" id="fcontact" required>
+      </div>
+      <div class="form-row">
+        <label id="labEmail">邮箱 <span class="req">*</span> / Email <span class="req">*</span></label>
+        <input type="email" id="femail" inputmode="email" placeholder="name@example.com" required>
+      </div>
+      <div class="form-row">
+        <label id="labNote">备注 / Note</label>
+        <textarea id="fnote" rows="2" placeholder="其他备注（可选）/ Other notes (optional)"></textarea>
+      </div>
+    </div>
+    <div class="mfoot">
+      <button class="btn-send" onclick="sendOrder()" id="btnSend">提交订单 / Submit Order</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ========== DATA (injected) ========== */
+var CATS = [{"cn":"🦐 海鲜","en":"🦐 Seafood"},{"cn":"🥩 肉类","en":"🥩 Meat"},{"cn":"🥦 蔬菜","en":"🥦 Vegetables"},{"cn":"🧄 调味品","en":"🧄 Sauces"},{"cn":"🥫 罐头干货","en":"🥫 Canned & Dry"},{"cn":"🌾 粮油面点","en":"🌾 Grains & Noodles"},{"cn":"🎂 点心糕点","en":"🎂 Pastries & Dim Sum"},{"cn":"📦 包装用品","en":"📦 Packaging"},{"cn":"🧹 卫生用品","en":"🧹 Cleaning"}];
+var PRODS = [{"code":"10140","name_en":"21012 Spare Rib around 35LB","name_cn":"排骨21012 (Farmland)-#2約35LB","stock":1338,"unit":"35lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"10338","name_en":"21075 (Hanbi) Bone In Butt around 90LB","name_cn":"21075 (Hanbi)豬肉约90LB/箱","stock":380,"unit":"90lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"10339","name_en":"IBP Bone In Pork Butts F1213-AG(Tyson) around 60LB","name_cn":"IBP猪肉-F1213-AG(Tyson)约60LB/箱","stock":83,"unit":"60lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11026","name_en":"Chicken Breast Bone 25LB/cs","name_cn":"雞骨-25LB/箱","stock":40,"unit":"25lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11112","name_en":"14088(S)&14085 B/L Breast 40lb","name_cn":"无骨鸡胸14088(S)&14085 40lb","stock":202,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11210","name_en":"4012 Whole Leg 40lb","name_cn":"鸡腿 4012 40lb","stock":28,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11236","name_en":"(Frozen) 4012 Whole Leg 40lb","name_cn":"(凍)4012鸡腿40lb","stock":173,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11302","name_en":"(Frozen) 00338 Chicken Wing 40LB","name_cn":"(凍)00338雞翅40LB","stock":304,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11308","name_en":"14540/14538   Chicken Wing 40lb","name_cn":"鸡翅 14540/14538 40lb","stock":274,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11357","name_en":"(Frozen) 55467 Cut Chicken Wing 44.09lb","name_cn":"(冻)切鸡翅 55467  44.09lb","stock":385,"unit":"44.09lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11370","name_en":"(Perdue) 874 Chicken Wing around 40LB","name_cn":"鸡翅(Perdue)超市874約40LB/箱","stock":75,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11383","name_en":"(Frozen)1606 (Perdue) Chicken Wing 40lb","name_cn":"(凍)(Perdue)1606鸡翅40lb","stock":196,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11396","name_en":"Frozen Chicken Wing 14540","name_cn":"鸡翅(冻) 14540 40lb/cs","stock":1235,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11397","name_en":"(Frozen) 31560 Chicken Wing 40LB/cs","name_cn":"(冻) 鸡翅-31560-40LB/箱Chicken Wing","stock":355,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11454","name_en":"Boneless legmeat 40lb/cs (96802&96832)","name_cn":"无骨鸡腿(96802&96832) 40lb/cs","stock":811,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"11618","name_en":"620 40lb  Frozen Cut Wing","name_cn":"冻切鸡翅 620 40lb/cs","stock":410,"unit":"40lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"12009","name_en":"(Frozen)03555 Flank Steak around 45LB","name_cn":"(冻)LP 03555好牛约45LB","stock":131,"unit":"45lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"12195","name_en":"(Frozen)(Florida Beef) Peeled Strip Beef (around 50LB)","name_cn":"(Florida Beef)鲜P牛(冻)(约50LB)","stock":0,"unit":"50lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"12231","name_en":"CW 牛肉眼(IBP)-6256&6257约85LB/箱Eye Round Beef~85lb","name_cn":"CW 牛肉眼(IBP)-6256&6257约85LB/箱Eye Round Beef~85lb","stock":1,"unit":"85lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"12233","name_en":"Frozen 32880 Eye Round Beef around 60LB/cs","name_cn":"冻32880牛肉眼 约60LB/箱","stock":274,"unit":"60lb/cs","cat_cn":"🥩 肉类","cat_en":"🥩 Meat"},{"code":"20058","name_en":"BeiJing Broccoli","name_cn":"北京芥兰","stock":1510,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20100","name_en":"Napa","name_cn":"绍菜","stock":131,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20310","name_en":"Green Onion(cs)","name_cn":"葱（箱）","stock":48,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20400","name_en":"Yellow Jumbo Onion","name_cn":"黄洋葱","stock":651,"unit":"bg","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20500","name_en":"Celery Box","name_cn":"芹菜（箱）","stock":135,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20510","name_en":"Celery Piece","name_cn":"芹菜（棵）","stock":75,"unit":"pc","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20700","name_en":"Green Pepper","name_cn":"青椒","stock":170,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"20800","name_en":"Jumbo Carrot","name_cn":"红萝卜 50lb/bg","stock":846,"unit":"bg","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21000","name_en":"Snow Peas","name_cn":"雪豆","stock":90,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21010","name_en":"Snap Bean","name_cn":"四季豆 木箱","stock":98,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21022","name_en":"Peas & Carrot 12x2lb","name_cn":"青红豆 12x2lb","stock":2273,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21030","name_en":"Green Peas 12x2lb","name_cn":"青豆 12x2lb","stock":82,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21101","name_en":"Potato","name_cn":"土豆","stock":920,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21110","name_en":"Red Potato","name_cn":"红土豆-50LB/箱","stock":16,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21120","name_en":"Sweet Potato","name_cn":"番薯","stock":5,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21130","name_en":"Red Onion 25lb","name_cn":"紫洋葱 25lb","stock":25,"unit":"pk","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21160","name_en":"Avocado","name_cn":"牛油果 60粒","stock":12,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21200","name_en":"Honeydew 4 6ctn.","name_cn":"白蜜瓜 4 6ctn.","stock":63,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21210","name_en":"cantaloupe","name_cn":"红蜜瓜","stock":14,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21220","name_en":"Cucumber","name_cn":"青瓜","stock":17,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21230","name_en":"Zucchini","name_cn":"意大利青瓜","stock":255,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21240","name_en":"Orange 64 88ctn.","name_cn":"柑（64-88粒）","stock":120,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21250","name_en":"(XL) 30 dozen  Egg","name_cn":"蛋 (XL) 30打","stock":652,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21252","name_en":"Large Egg 30 dozen/box","name_cn":"蛋 (L)30 打/cs","stock":2663,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21262","name_en":"24lb/cs Plantains","name_cn":"香蕉 炸 (棕箱)24lb/cs Plantains","stock":1626,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21310","name_en":"Pineapple","name_cn":"菠萝","stock":14,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21400","name_en":"Mushrooms","name_cn":"蘑菇","stock":212,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21410","name_en":"Bean Sprouts 10lb","name_cn":"芽菜","stock":19,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21420","name_en":"Iceberg Lettuce 24ctn.","name_cn":"圆生菜","stock":45,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21504","name_en":"Xinxing Tofu 12box x 16oz","name_cn":"新兴豆腐12盒X16oz/箱","stock":174,"unit":"12bx/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21513","name_en":"Soft Tofu (Green) 14oz","name_cn":"绿豆腐 -14oz/盒","stock":24,"unit":"bx","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21514","name_en":"(Xinxing) Tofu 16oz/box","name_cn":"新兴豆腐-16oz/盒","stock":12,"unit":"bx","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21556","name_en":"(Mori-Nu) Firm Tofu 12x10.8oz","name_cn":"日本营养豆腐(老)12x10.8oz/箱","stock":230,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21592","name_en":"(ICHIBAN) Soft Tofu-12*14oz/cs","name_cn":"(ICHIBAN)绿豆腐 12*14oz/箱","stock":90,"unit":"12bx/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21600","name_en":"Ginger 5lb/bg","name_cn":"姜 5lb/bg","stock":102,"unit":"bg","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21603","name_en":"Peeled Garlic 5lb","name_cn":"去皮蒜头 5lb/罐","stock":76,"unit":"cn","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21604","name_en":"Lemon (bag)","name_cn":"柠檬（包）","stock":3,"unit":"dz","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21610","name_en":"Ginger 30lb","name_cn":"姜  30lb/cs","stock":25,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21613","name_en":"Peeled Garlic 20lb","name_cn":"去皮蒜头 20lb/cs","stock":66,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"21614","name_en":"Lemons 140 165ctn./box","name_cn":"柠檬 140 165粒/cs","stock":129,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"22026","name_en":"Daikon box","name_cn":"白萝卜 箱","stock":100,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23013","name_en":"700-1000g Belt Fish 22LB/cs","name_cn":"700-1000g 带鱼 22lb/箱","stock":3,"unit":"22lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23022","name_en":"1100-1800g Halibut 10KG","name_cn":"1100-1800g 比目鱼 10KG","stock":25,"unit":"22.10lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23028","name_en":"2-4LB Spanish Mackerel(Sierra) 40lb","name_cn":"2-4LB 马鲛鱼 40lb","stock":1,"unit":"40lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23032","name_en":"5/7oz Catfish Fillet 15LB","name_cn":"5/7oz貓魚片15LB","stock":3,"unit":"15lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23048","name_en":"350/550 Tilapia Fish Gutted & Scaled 40LB/cs","name_cn":"350/550 海鲫鱼-无肚  40磅/箱","stock":15,"unit":"40lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23049","name_en":"550/750 Tilapia Fish Gutted and Scaled - 40LB/cs","name_cn":"550/750 海鲫鱼-无肚  40磅/箱","stock":9,"unit":"40lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23059","name_en":"500up Frozen Stripe Bass 40LB/cs","name_cn":"500up 鲈鱼-40lb/箱","stock":3,"unit":"40lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23061","name_en":"1-2LB Red Snapper 10LB","name_cn":"1-2LB紅鯛魚10LB","stock":1,"unit":"10lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23066","name_en":"100-120g Mackerel Pike 20.5LB","name_cn":"100-120g 秋刀魚20.5LB","stock":2,"unit":"20.5lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23325","name_en":"(Frozen) 3/5Kg Eel Fish around 26LB","name_cn":"(冻)3/5Kg整隻去肚鰻魚約26LB/箱","stock":11,"unit":"26lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23333","name_en":"600/700 Yellow Croaker 10LB/cs","name_cn":"600/700 真黃花魚10磅/箱","stock":600,"unit":"10lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23335","name_en":"200/300 Yellow Croaker 10LB/cs","name_cn":"200/300 真黃花魚10磅/箱","stock":8,"unit":"10lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23343","name_en":"600-800g Golden Pompano 40LB","name_cn":"600-800g 金錩魚40LB","stock":7,"unit":"40lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"23350","name_en":"700/1000 Cuttlefish Whole Round - 22LB/cs","name_cn":"700/1000 大墨魚 - 22磅/箱","stock":1,"unit":"22lb/bg","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24000","name_en":"Aged Chicken around 3LB/unit","name_cn":"老鸡約3LB/頭","stock":62,"unit":"3lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24010","name_en":"Aged Chicken around 32LB/cs","name_cn":"老鸡約32LB/箱","stock":192,"unit":"32lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24022","name_en":"4/6oz Frog Leg 70% - 30LB/cs","name_cn":"4/6oz 田雞腿 70% - 30磅/箱","stock":10,"unit":"30lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24100","name_en":"Frozen Duckling 5.5lb/unit","name_cn":"冻鸭5.5lb/只","stock":73,"unit":"5.5lb/pc","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24101","name_en":"Frozen Duckling Around 33LB/box","name_cn":"冻鸭約33LB/箱","stock":378,"unit":"33lb/bx","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24111","name_en":"Roast Duck/pc","name_cn":"烧鸭 头","stock":49,"unit":"pc","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24211","name_en":"Pig Feet 30lb/cs","name_cn":"猪脚30lb/cs","stock":268,"unit":"30lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24222","name_en":"Pork Belly around 45LB/cs","name_cn":"三层肉約45LB/箱","stock":83,"unit":"45lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24228","name_en":"Cut Pig Feet 5lb","name_cn":"切猪脚 5lb/bg","stock":125,"unit":"5lb/pk","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"24331","name_en":"(290 & W59300)Beef Rough Cut Flank around 65LB/cs","name_cn":"(290 & W59300)牛腩約65LB/箱","stock":0,"unit":"65lb/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25020","name_en":"豆腐乳(黄日香)-瓶 Preserved Bean Curd","name_cn":"豆腐乳(黄日香)-瓶 Preserved Bean Curd","stock":22,"unit":"btl","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25100","name_en":"Preserved Vegetable Shredded 12oz/cn","name_cn":"榨菜丝 12oz/cn","stock":29,"unit":"cn","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25101","name_en":"Preserved Vegetable Shredded 48X12oz","name_cn":"榨菜丝48罐X12oz","stock":52,"unit":"48cn/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25287","name_en":"永日香卤味豆丝-190g/包 Dried Bean Curd","name_cn":"永日香卤味豆丝-190g/包 Dried Bean Curd","stock":10,"unit":"bg","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25330","name_en":"肉松(中华)-大-16oz/罐 Pork Sung","name_cn":"肉松(中华)-大-16oz/罐 Pork Sung","stock":8,"unit":"cn","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25515","name_en":"Milk Drink (24x245ml)","name_cn":"旺仔牛奶 24x245ml/cs","stock":50,"unit":"24cn/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25591","name_en":"(Kimbo) soy milkoriginal 24X320ml","name_cn":"金宝豆奶 24X320ml","stock":47,"unit":"24cn/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25604","name_en":"Fuzhou Steamed Bun","name_cn":"精制牛奶馒头 6块/bg","stock":2385,"unit":"pk","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25607","name_en":"Fuzhou Pork Bun","name_cn":"福州大肉包 (4块)/bg","stock":1301,"unit":"pk","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25650","name_en":"Wei Chuan Pork Dumping 8 bag/box","name_cn":"味全猪肉煎饺 8 bag/box","stock":644,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25664","name_en":"Wei Chuan Veg&Chicken Dumping 8bag/box","name_cn":"味全鸡肉煎饺 8 bag/box","stock":257,"unit":"8bg/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25761","name_en":"Mooncake","name_cn":"合丰综合月饼","stock":67,"unit":"bx","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25823","name_en":"Wei Chuan) pot sticker pork&veg 8x32oz/cs","name_cn":"王府井味全豬肉鍋貼8X32oz/箱","stock":225,"unit":"cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"25846","name_en":"OCM Pork Gyoza 12X32oz","name_cn":"猪肉水饺（李先生）OCM 12X32oz","stock":817,"unit":"12bg/cs","cat_cn":"🥦 蔬菜","cat_en":"🥦 Vegetables"},{"code":"28100","name_en":"Fish Tofu 5x5lb/cs","name_cn":"(C 20)鱼豆腐  5x5lb/cs","stock":3,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"28101","name_en":"Fish Tofu 5lb/bg","name_cn":"(C 20)鱼豆腐5lb/bg","stock":58,"unit":"bg","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"28103","name_en":"Fried Fish roll 5lb/bg","name_cn":"(C 33)烤魷魚5lb/bg","stock":2,"unit":"bg","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"30091","name_en":"16/20 (Fiesta) Panama IQF P&D Shrimp(10lb)","name_cn":"(10磅)16/20 (Fiesta)南美单冻开背虾仁","stock":69,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30111","name_en":"26/30 (Fiesta) Ecuador IQF P&D Shrimp(10lb) 100%","name_cn":"(10磅)26/30 (Fiesta)南美单冻开背虾仁 100%","stock":153,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30113","name_en":"26/30 (Triton)IQF P&D T-ON Shrimp(10lb)","name_cn":"(10磅)26/30 (Triton)单冻开背虾仁有尾","stock":21,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30115","name_en":"26/30 (Monarca) Ecuador IQF P&D Shrimp(20lb) 100%","name_cn":"(20磅) 26/30 (Monarca)南美单冻开背虾仁 100%","stock":232,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30116","name_en":"26/30 (EQ) Ecuador IQF P&D Shrimp(20lb) 100%","name_cn":"(20磅) 26/30 (EQ)南美单冻开背虾仁 100%","stock":48,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30122","name_en":"31/40 (Bayfresh) IQF P&D Shrimp(20lb) 100%","name_cn":"(20磅) 31/40 (Bayfresh)单冻开背虾仁 100%","stock":1,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30123","name_en":"31/40 (Three Seas) IQF P&D Shrimp(30lb) 80%","name_cn":"(30磅) 31/40 (Three Seas)单冻开背虾仁 80%","stock":10,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30124","name_en":"31/40 (Triton) IQF P&D Shrimp(10lb)","name_cn":"(10磅) )31/40 (Triton) 单冻开背虾仁","stock":113,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30134","name_en":"41/50 (Southern Seas) IQF P&D Shrimp(30lb) 80%","name_cn":"(30磅) 41/50 (Southern Seas)单冻开背虾仁 80%","stock":331,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30143","name_en":"51/60 (Monarca) Ecuador IQF P&D Shrimp(20lb) 100%","name_cn":"(20磅) 51/60 (Monarca)南美单冻开背虾仁 100%","stock":171,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30166","name_en":"71/90 (Sea Star) IQF P&D Shrimp(30lb) 75%","name_cn":"(30磅) 71/90 (Sea Star)单冻开背虾仁 75%","stock":146,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30169","name_en":"71/90 (Crown) Ecuador Block P&D Shrimp(40lb) 100%","name_cn":"(40磅) 71/90 (Crown)南美块冻开背虾仁 100%","stock":1,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30171","name_en":"150UP (Victor) Block P&D Shrimp(50lb)","name_cn":"(50磅) 150UP (Victor)块冻开背虾仁","stock":22,"unit":"50lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30251","name_en":"61/70 (Star Bay) IQF P&D Shrimp(30lb) 80%","name_cn":"(30磅) 61/70 (Star Bay)单冻开背虾仁 80%","stock":13,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30252","name_en":"61/70 (Triton) IQF P&D Shrimp(10lb)","name_cn":"(10磅) )61/70 (Triton) 单冻开背虾仁","stock":21,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30258","name_en":"61/70 (Crown) Ecuador Block P&D Shrimp(40lb)","name_cn":"(40磅) 61/70 (Crown)南美块冻开背虾仁","stock":3,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30261","name_en":"71/90 (Triton) IQF P&D Shrimp(10lb)","name_cn":"(10磅) )71/90 (Triton) 单冻开背虾仁","stock":28,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30360","name_en":"Dungeness Crab Sections 25LB","name_cn":"切蟹25LB","stock":20,"unit":"25lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30411","name_en":"Frozen Lobster Tail Meat 2LB/bg","name_cn":"龍蝦尾肉2LB/bg","stock":8,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30440","name_en":"Frozen Lobster Tails 5-6oz 10LB","name_cn":"龍蝦尾5-6oz 10LB","stock":27,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30442","name_en":"Lobster Tails 5oz 10LB (Warm Water)","name_cn":"溫水龍蝦尾5oz 10LB","stock":11,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30517","name_en":"20/30 (Frescamar) HOSO Shrimp(40lb) 100%","name_cn":"(40磅) 20/30 (Frescamar)有头虾 100%","stock":10,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30523","name_en":"30/40 (Frescamar) HOSO Shrimp(40lb) 100%","name_cn":"(40磅) 30/40 (Frescamar)有头虾 100%","stock":9,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30524","name_en":"40/50 (Songa) HOSO Shrimp(24lb) 100%","name_cn":"(24磅) 40/50 (南美虾皇)有头虾 100%","stock":47,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30525","name_en":"40/50 (EQ) HOSO Shrimp(40lb) 100%","name_cn":"(40磅) 40/50 (有信)有头虾 100%","stock":55,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30531","name_en":"50/60 (Frescamar) HOSO Shrimp(40lb) 100%","name_cn":"(40磅) 50/60 (Frescamar)有头虾100%","stock":19,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30541","name_en":"60/70 (EQ) HOSO Shrimp(40lb) 100%","name_cn":"(40磅) 60/70 (有信)有头虾 100%","stock":28,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30636","name_en":"16/20 Tempura Shrimp 4x30pc/cs","name_cn":"16/20 天妇罗炸虾 4x30pc/箱","stock":7,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30639","name_en":"Ebi Shrimp 3L  (20/30pcs)","name_cn":"甜虾 3L 20盒 30pcs","stock":4,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30640","name_en":"(L) Arctic Surf Clams 2.2LB","name_cn":"(L)北极贝 2.2LB/包","stock":3,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30741","name_en":"Oyster Meat - 5LB/bg","name_cn":"生蠔肉 - 5磅/包","stock":7,"unit":"5lb/bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30748","name_en":"Half Shell Oyster 144pc","name_cn":"速冻半壳生蚝 144pc","stock":26,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30800","name_en":"21-25 Bread Shrimp 8x3LB/cs","name_cn":"21-25蝴蝶虾8x3LB/箱 Bread Shrimp","stock":21,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30911","name_en":"3/5 Whole Clean Mexico Crab 20LB","name_cn":"3/5整隻clean墨西哥蟹 20磅/箱","stock":16,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"30912","name_en":"5/7 Whole Clean Mexico Crab 20LB","name_cn":"5/7整隻clean墨西哥蟹 20磅/箱","stock":12,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31001","name_en":"16/20 (Tropical) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 16/20 (Tropical)南美去头有壳虾","stock":30,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31041","name_en":"16/20 (Fiesta) IQF EZPeel Shrimp(20lb)","name_cn":"(20磅) 16/20 (Fiesta)单冻开背有壳虾","stock":30,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31149","name_en":"21/25 (OceanChef) Ecuador HLSO Shrimp(50lb)","name_cn":"(50磅) 21/25 (OceanChef) 南美去头有壳虾","stock":201,"unit":"50lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31153","name_en":"21/25 (Tropical) Ecuador IQF EZPeel Shrimp(20lb)","name_cn":"(20磅) 21/25 (Tropical)南美单冻开背有壳","stock":2,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31164","name_en":"21/25 (HQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 21/25 (HQ)南美去头有壳虾","stock":4,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31204","name_en":"26/30 (Monarca) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 26/30 (Monarca)南美去头有壳虾","stock":175,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31301","name_en":"31/35 (HQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 31/35 (HQ)南美去头有壳虾","stock":18,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31302","name_en":"36/40 (HQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 36/40 (HQ)南美去头有壳虾","stock":47,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31401","name_en":"41/50 (OceanChef) Ecuador HLSO Shrimp(50lb)","name_cn":"(50磅) 41/50 (OceanChef) 南美去头有壳虾","stock":126,"unit":"50lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31402","name_en":"41/50 (Monarca) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 41/50 (Monarca)南美去头有壳虾","stock":2,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31461","name_en":"41/50 (Tropical) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 41/50 (Tropical)南美去头有壳虾","stock":40,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31501","name_en":"51/60 (EQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 51/60 (有信)南美去头有壳虾","stock":8,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31502","name_en":"51/60 (OceanChef) Ecuador HLSO Shrimp(50lb)","name_cn":"(50磅) 51/60 (OceanChef) 南美去头有壳虾","stock":127,"unit":"50lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31601","name_en":"61/70 (EQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 61/70 (有信)南美去头有壳虾","stock":54,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"31761","name_en":"71/90 (EQ) Ecuador HLSO Shrimp(40lb)","name_cn":"(40磅) 71/90 (有信)南美去头有壳虾","stock":8,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32010","name_en":"10/20 Premium Grade Scallops 10x4.4lb/cs","name_cn":"10/20 大干贝 10x4.4lb/cs","stock":37,"unit":"44lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32011","name_en":"10/20 Premium Grade Scallops 4.4lb/bx","name_cn":"10/20 大干贝4.4lb/bx","stock":11,"unit":"4.4lb/bx","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32027","name_en":"20 30 Premium Grade Scallops 50lb/cs","name_cn":"20 30 大干贝 50lb/cs","stock":34,"unit":"50lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32028","name_en":"20 30 Premium Grade Scallops 5lb/box","name_cn":"20 30 大干贝5lb/box","stock":18,"unit":"5lb/bx","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32036","name_en":"30 40 IQF Frozen Scallops 5lb/box","name_cn":"30 40单冻干贝 5lb/盒","stock":15,"unit":"5lb/bx","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32037","name_en":"30 40 IQF Frozen Scallops 30lb","name_cn":"30 40单冻干贝 30lb/cs","stock":53,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32060","name_en":"60/80 IQF Frozen Scallops 30lb","name_cn":"60/80 单冻干贝 30lb/cs","stock":6,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32110","name_en":"Breaded Imi.Scallop 30x1lb/cs","name_cn":"有粉干贝 30x1lb/cs","stock":33,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"32111","name_en":"Breaded Imi.Scallop 1lb/bg","name_cn":"有粉干贝 1lb/bg","stock":332,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33000","name_en":"5/8 Norway Snow Crab Leg 20LB","name_cn":"5/8 挪威蟹脚 20LB/cs","stock":9,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33001","name_en":"5/8 Snow Crab Leg 30LB","name_cn":"5/8 蟹脚 30lb/cs","stock":72,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33002","name_en":"8-10oz Snow Crab Clusters 30LB","name_cn":"8-10oz 雪蟹蟹脚30LB","stock":42,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33003","name_en":"10-12oz Snow Crab Clusters 30LB","name_cn":"10-12oz 雪蟹蟹脚30LB","stock":1,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33005","name_en":"(30lbs)5/8 Snow Carb Cheticamp","name_cn":"(30lbs)5/8雪蟹 Cheticamp","stock":20,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33006","name_en":"14/17 Gold King Crab Legs & Claws 20LB","name_cn":"14/17帝王蟹蟹腳20LB","stock":2,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33010","name_en":"Breaded Crab Claw 10x2.2lb/cs","name_cn":"有粉蟹钳 10x2.2lb/cs","stock":67,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33020","name_en":"Soft Shell Crab 14pc 6x1kg Prime","name_cn":"軟螃蟹 14pc 6x1kg","stock":1,"unit":"6bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33021","name_en":"Soft Shell Crab 18pc 6x1kg Hotel","name_cn":"軟螃蟹 18pc 6x1kg","stock":3,"unit":"6bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33100","name_en":"Minced Stick 6x5lb/cs","name_cn":"(顶好)实心蟹条 6x5lb/cs","stock":115,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33101","name_en":"(Great Wall) XL Minced Stick 6x5lb/cs","name_cn":"(Great Wall) XL实心蟹条 6x5lb/cs","stock":16,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33105","name_en":"(Legend of Master) Fish Cake Sticks Kani Red- 22LB/cs","name_cn":"(匠傳)-高級蟹條 - 22磅/箱","stock":9,"unit":"20bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33110","name_en":"Minced Stick 5lb/bg","name_cn":"(顶好)实心蟹条 5lb/bg","stock":59,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33120","name_en":"Filament Style 6x5lb/cs","name_cn":"(顶好)散蟹条 6x5lb/cs","stock":23,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33121","name_en":"(Great Wall) XL Crab Flake 15x2lb/cs","name_cn":"(Great Wall) XL散蟹片 15x2lb/cs","stock":66,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33130","name_en":"Filament Style 5lb/bg","name_cn":"(顶好)散蟹条 5lb/bg","stock":59,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33140","name_en":"Flake Style 12x2.5lb/cs","name_cn":"(顶好)切片蟹条 12x2.5lb/cs","stock":28,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33141","name_en":"(Oyster Bay)Supreme Flakes 12x2.5lb/cs","name_cn":"(Oyster Bay)切片蟹条 12x2.5lb/cs","stock":27,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33250","name_en":"16/22 10lb Craw Fish","name_cn":"龙虾仔16/22 10lb/cs","stock":161,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33253","name_en":"10/15 10lb Craw Fish","name_cn":"龙虾仔10/15 10lb/cs","stock":100,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33258","name_en":"U-10 10lb Crawfish","name_cn":"龙虾仔U-10 10lb/cs","stock":12,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33270","name_en":"3/5oz Tilapia Fillet - 10LB/cs","name_cn":"3/5oz側魚片10LB/箱","stock":13,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33271","name_en":"5/7oz Tilapia Fillet - 10LB/cs","name_cn":"5/7oz側魚片10LB/箱","stock":11,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33275","name_en":"4/6oz Whiting Skinless Fillet -40LB/cs","name_cn":"4/6oz 白肉魚片無皮-40磅/箱","stock":4,"unit":"40lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33289","name_en":"4/5LB Salmon Fillet Trim E - 33.07LB/cs","name_cn":"4/5LB 無皮三文魚片 33.07LB","stock":5,"unit":"33.07lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33290","name_en":"4/6oz Pollock Fillet 100% - 10LB/cs","name_cn":"4/6oz 無骨魚 100% - 10磅/箱","stock":7,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33303","name_en":"Swai Fish Fillets(10-12)22lb","name_cn":"龙利鱼片(10-12) 22lb","stock":5,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33304","name_en":"Swai Fish Fillets(9-11) 15lb","name_cn":"龙利鱼片(9-11) 15lb","stock":116,"unit":"15lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33306","name_en":"Swai Fish Fillets(7-9)15lb","name_cn":"龙利鱼片(7-9) 15lb","stock":151,"unit":"15lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33308","name_en":"Swai Fish Fillets(3-5)15lb","name_cn":"龙利鱼片(3-5) 15lb","stock":2,"unit":"15lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33310","name_en":"U5 Skinless Squid 22lb","name_cn":"去皮鱿鱼 22lb","stock":554,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33313","name_en":"5/8 T&T Squid - 10LB/cs","name_cn":"5/8 T&T魷魚 - 10磅/箱","stock":14,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33318","name_en":"20/25cm Whole Loligo Squid- 11.05lb/cs","name_cn":"20/25cm 有頭魷魚USA - 11.05lb/cs","stock":8,"unit":"11.05lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33319","name_en":"600g UP Big Squid 38.5lb","name_cn":"600g UP 特大有头鱿鱼 38.5lb","stock":21,"unit":"38.5lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33320","name_en":"Breaded Squid Sticks - 6x2LB/cs","name_cn":"炸魷魚條 - 6x2磅/箱","stock":9,"unit":"12lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33321","name_en":"Breaded Cheese Sticks - 24LB/cs","name_cn":"芝士條 - 24磅/箱","stock":21,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33326","name_en":"4-6cm Carving Squid 20x1LB","name_cn":"4-6cm刻花魷魚 20X1LB","stock":7,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33332","name_en":"400/600 Illex Argentinus 30.87lb","name_cn":"400/600 阿根廷有头鱿鱼30.87lb","stock":21,"unit":"30.87lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33340","name_en":"5/8 Tuna Loin -30lb/cs","name_cn":"5/8LB 鮪魚腹肉 - 30磅/箱","stock":17,"unit":"30lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33341","name_en":"Escolar Saku (22lb)","name_cn":"白吞拿 22磅","stock":1,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33345","name_en":"Tuna Ground Meat 20lb/cs","name_cn":"鮪魚绞肉 - 20磅/箱","stock":3,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33348","name_en":"12-16oz Yellowfin Tuna Saku 10LB/cs","name_cn":"12-16oz黃鰭金槍魚刺身塊10LB/箱","stock":1,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33352","name_en":"3-9cm Squid Rings 20X1LB","name_cn":"3-9cm 魷魚圈20X1LB","stock":2,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33500","name_en":"(L)Half Mussel 24LB","name_cn":"(L)半壳青口24LB","stock":36,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33510","name_en":"(M)Half Mussel 24LB","name_cn":"(M)半壳青口24LB","stock":45,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33520","name_en":"(Chile) Whole Black Mussel 10LB","name_cn":"(智利)整只黑色青口 10LB","stock":37,"unit":"10lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33522","name_en":"(Chile) 37/46ct Half Black Mussel 22lb","name_cn":"(智利)37/46ct 半壳黑色青口 22lb","stock":15,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33601","name_en":"11-20 Clam 10x2lb","name_cn":"11-20 花蛤 10x2lb","stock":49,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33629","name_en":"17/22 White Clam 20LB","name_cn":"17/22白蚌20LB","stock":20,"unit":"20lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33700","name_en":"16/25 Baby Octopus - (GW)24LB/cs","name_cn":"16/25 八爪魚 - 24磅/箱","stock":34,"unit":"24lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33900","name_en":"Sausage 11LB","name_cn":"香肠 11LB","stock":123,"unit":"11lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33907","name_en":"(Prime Food)Mini Pork Patty Link/Corn10oz/bg","name_cn":"(嘉嘉)猪肉玉米亲亲肠10oz/bg","stock":402,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33974","name_en":"Beef Tendon Ball 8oz","name_cn":"(味全)潮州牛筋丸 8oz/bg","stock":42,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33977","name_en":"Cuttle Fish Balls","name_cn":"(味全)花枝丸 8oz/bg","stock":39,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"33978","name_en":"(LKK)Tomato Soup Base 1kg","name_cn":"(李锦记)番茄汤底料 1kg/包","stock":116,"unit":"bg","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34027","name_en":"Interstate 3/8in Straight Cut French Fries 6x5lb","name_cn":"(Interstate) 3/8in 细薯条 6x5lb","stock":260,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34075","name_en":"(Quality Farm) 1/2in Crinkle Cut French Fries 6X5LB","name_cn":"(Quality Farm) 1/2in 粗薯条6X5LB","stock":35,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34081","name_en":"(Quality Farm) 3/8in Straight Cut French Fries 6X5LB","name_cn":"(Quality Farm) 3/8in 细薯条6X5LB","stock":160,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34092","name_en":"SP01 1/2in Crinkle Cut French Fries 6X5LB","name_cn":"(SP01) 1/2in 粗薯條6X5LB","stock":636,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34221","name_en":"712171 Battered extrnded 8x2lb OnionRings","name_cn":"洋葱环(白箱)712171 8x2lb/cs","stock":229,"unit":"8bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34302","name_en":"069302 Chicken Nuggets 20LB/cs","name_cn":"鸡粒-069302-20LB/箱Chicken Nugget","stock":816,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"34501","name_en":"Corn Nugget 6x2lb","name_cn":"炸玉米粒 6x2lb","stock":633,"unit":"6bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35010","name_en":"20lb/ Pink Sushi Ginger","name_cn":"日本姜片(红色) 20lb/桶","stock":47,"unit":"bkt","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35033","name_en":"11oz Frozen Roasted Eel 2X11LB","name_cn":"11oz日本燒鰻魚2X11LB","stock":1,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35036","name_en":"14oz Frozen Roasted Eel 2X11LB","name_cn":"14oz日本燒鰻魚2X11LB","stock":2,"unit":"22lb/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35075","name_en":"4x4.4lb Seaweed Salad","name_cn":"日本海带沙拉 4x4.4lb/cs","stock":12,"unit":"4bx/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35076","name_en":"4.4lb Seaweed Salad","name_cn":"日本海带沙拉 4.4lb/盒","stock":10,"unit":"bx","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35106","name_en":"(Gold)Halfcut Sushi Nori 10x100pc/cs","name_cn":"寿司紫菜(金)(半張)特级10x100pc/cs","stock":31,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35110","name_en":"100 Sushi Nori","name_cn":"寿司紫菜( 半张)100/bg","stock":8,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35116","name_en":"(Green)HALF Sushi Nori 10bagx100pc/cs","name_cn":"寿司紫菜(Green)HALF 10包x100pc/cs","stock":430,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35126","name_en":"Wasabi Powder 10x2.2lb","name_cn":"日本芥辣粉 10x2.2lb","stock":12,"unit":"10bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35127","name_en":"Wasabi Powder 2.2lb/bg","name_cn":"日本芥辣粉  2.2lb/bg","stock":19,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35131","name_en":"(FuJi) Sushi Vinegar 3.97GAL","name_cn":"(富士)寿司醋 3.97GAL","stock":48,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35154","name_en":"Gold(Wel Pac) Tempura batter Mix 40lb","name_cn":"Gold(Wel Pac) 日本甜不辣粉 40lb","stock":1155,"unit":"pk","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35412","name_en":"(Sanuki) (240gx5)x6 Udon Noodle","name_cn":"乌冬面(Sanuki) (240gx5)x6包/cs","stock":456,"unit":"6bg/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35486","name_en":"Edamame 20x14oz","name_cn":"毛豆荚 20x14oz","stock":44,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35628","name_en":"Sushi/Eel Sauce 6X5LB/cs","name_cn":"烧鳗汁(万字) 6X5LB/cs","stock":50,"unit":"6btl/cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35629","name_en":"(Kikkoman) Sushi/Eel Sauce 5LB/jar","name_cn":"(Kikkoman)燒鰻汁5LB/罐","stock":46,"unit":"btl","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"35650","name_en":"White Bamboo Chopsticks 20 bags/cs","name_cn":"白封套日本竹筷子(佳乐) 20包/cs","stock":96,"unit":"cs","cat_cn":"🦐 海鲜","cat_en":"🦐 Seafood"},{"code":"40000","name_en":"(Kari Out) Cooking Sherry 4x1GAL","name_cn":"(Kari Out) 红胶酒 4x1GAL","stock":709,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40001","name_en":"(W.Y) 4x1GL Cooking Sherry","name_cn":"红胶酒(W.Y) 4x1GL/cs","stock":162,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40100","name_en":"(Kari Out) Cooking Wine 4x1GAL","name_cn":"(Kari Out) 白胶酒 4x1GAL","stock":388,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40101","name_en":"(W.Y) 4x1GL Cooking Wine","name_cn":"白胶酒(W.Y) 4x1GL/cs","stock":94,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40214","name_en":"Shaoxing Wine (4X1gallon)","name_cn":"绍兴料酒 (4X1gallon)","stock":895,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40300","name_en":"Aged Fukein Cooking. Wine 750ml/btl","name_cn":"福建老酒 750ml/btl","stock":12,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40303","name_en":"Fukein Cooking. Wine 750ml/btl","name_cn":"福建料酒(万灯) 750ml/btl","stock":8,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40310","name_en":"12x750ml Fukein Wine","name_cn":"福建老酒 12x750毫升/cs","stock":518,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40315","name_en":"12x750ml Fukein C.Wine","name_cn":"福建料酒(万灯) 12x750毫升/cs","stock":167,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40359","name_en":"(Summerfield) 4X3L Michiu Cooking Wine","name_cn":"(Summerfield)米酒4X3L","stock":241,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40508","name_en":"(Hunsty) White Vinegar 4x1GAL/box","name_cn":"(Hunsty) 醋 4x1GAL/box","stock":1198,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40513","name_en":"Black Vinegar 24x550ml","name_cn":"镇江香醋 24x550ml","stock":11,"unit":"24btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40514","name_en":"Black Vinegar 550ml/btl","name_cn":"镇江香醋 550ml/btl","stock":22,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40600","name_en":"(Kari Out) Tomato Shade Color 4x1GAL","name_cn":"(Kari Out) 红水 4x1GAL","stock":301,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40602","name_en":"W.Y Tomato Shade Color 4x1GAL","name_cn":"W.Y 红水4x1GAL","stock":101,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40610","name_en":"(Kari Out) Egg Shade Food Color 12x2lb/box","name_cn":"(Kari Out) 黄水12x2lb/box","stock":526,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40612","name_en":"(WY) 4X1Gl Egg Shaded Food Color","name_cn":"黄水(WY) 4X1Gl/cs Egg Shaded Food Color","stock":150,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40620","name_en":"(Kari Out) Hot Sauce 4x1GAL/box","name_cn":"(Kari Out) 辣椒水 4x1GAL/box","stock":76,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40622","name_en":"(WY) 4x1GL Hot Sause","name_cn":"辣椒水(WY) 4x1GL/cs Hot Sause","stock":55,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"40623","name_en":"(Yi Pin) Hot Sause 4x1GAL/box","name_cn":"(Yi Pin) 辣椒水 4x1GAL/box","stock":117,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41000","name_en":"KC Hoisin Sauce 6cn/cs","name_cn":"KC 海鲜酱 6cn/cs","stock":556,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41001","name_en":"(LKK)Chefs Select Hoisin Sauce","name_cn":"(李)厨师精选海鲜酱-6罐/箱","stock":1137,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41002","name_en":"LKK Hoisin Sauce 6can/case","name_cn":"海鲜酱(李锦记)-6罐/箱 Hoisin Sauce","stock":122,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41004","name_en":"(Haday)Hoisin Sauce 6x5LB","name_cn":"(海天)海鲜酱6x5LB","stock":515,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41103","name_en":"Asiawin Chili Garlic Sauce 4x140oz/cs","name_cn":"冠亚 蒜蓉辣椒酱 4x140oz/cs","stock":574,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41104","name_en":"(LKK)2.13kgx6Chili Garlic Sauce","name_cn":"蒜蓉辣酱(LKK)2.13kgx6","stock":152,"unit":"6btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41108","name_en":"(Huy Fong)Chili Garlic Sauce 3x1GAL/cs","name_cn":"蒜蓉越南辣酱（公鸡） 3x1GAL/cs","stock":33,"unit":"3btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41130","name_en":"(Huy Fong) Sriracha Chili Sauce 12x28oz/cs","name_cn":"是拉差甜辣椒醬(公雞) 12瓶X28oz","stock":96,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41136","name_en":"(Kikkoman) 4lb Sriracha sauce","name_cn":"是拉差香甜辣椒酱(Kikkoman) 4lb","stock":74,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41152","name_en":"(Mae Ploy) 12x730ml Sweet chili  sauce","name_cn":"甜辣椒酱(Mae Ploy) 12x730ml/cs","stock":15,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41200","name_en":"12x26oz BH Sacha Sauce","name_cn":"沙茶酱(牛头) 12x26oz/cs","stock":50,"unit":"12cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41201","name_en":"BH Sacha Sauce 26oz/cn","name_cn":"沙茶酱(牛头) 26oz","stock":37,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41204","name_en":"26ozX12/cs SH Sacha Sauce","name_cn":"沙茶酱(东之味) 26ozX12/cs","stock":20,"unit":"12cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41205","name_en":"SH Sacha Sauce 26oz/cn","name_cn":"沙茶酱(东之味) 26oz","stock":8,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41300","name_en":"Unhot Bean Sauce 6oz/cn","name_cn":"豆瓣酱无辣 6oz/罐","stock":127,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41310","name_en":"Hot Bean Sauce 6oz/cn","name_cn":"豆瓣酱辣 6oz/罐","stock":119,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41320","name_en":"Unhot Bean Sauce 96x6oz","name_cn":"豆瓣酱无辣  96x6oz/cs","stock":10,"unit":"96cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41330","name_en":"Hot Bean Sauce 96x6oz","name_cn":"豆瓣酱辣  96x6oz/cs","stock":3,"unit":"96cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41400","name_en":"Apple Sauce 6cn/cs","name_cn":"苹果酱 6cn/cs","stock":411,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41410","name_en":"Peanut Butter 6x4lb","name_cn":"花生酱 6x4lb","stock":51,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41420","name_en":"Peanut Butter 4lb","name_cn":"花生酱 4lb","stock":55,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41467","name_en":"5lb Teriyaki Glaze","name_cn":"(KKM)照燒醬 5lb/罐","stock":2,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41500","name_en":"KC Ground Bean Sauce","name_cn":"磨原豉酱(冠珍) 6罐/cs","stock":119,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41603","name_en":"Maltose 400gram","name_cn":"麦芽糖 400g","stock":8,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41614","name_en":"Maltose 36x 400g/cs","name_cn":"麦芽糖 36x 400g/cs","stock":5,"unit":"36cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41630","name_en":"Honey 6x5lb","name_cn":"胶蜜 6x5lb","stock":255,"unit":"6btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41631","name_en":"Honey 5lb/btl","name_cn":"胶蜜 5lb/btl","stock":10,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41636","name_en":"(Kari out) 6x5lb/Honey","name_cn":"胶蜜(Kari out) 6x5lb","stock":53,"unit":"6btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41707","name_en":"(Super Chef) 4x1GL Mayo Sauce","name_cn":"美奶酱(Super Chef) 4x1GL/cs","stock":1469,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41713","name_en":"Tar Tar Sauce 4x1GAL/cs","name_cn":"它它酱 4x1GAL/cs","stock":17,"unit":"4btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41714","name_en":"Tar Tar Sauce 1GAL/btl","name_cn":"它它酱 1GAL/btl","stock":2,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41740","name_en":"Condensed milk 24x14oz","name_cn":"（雀巢）炼乳 24x14oz/箱","stock":61,"unit":"24btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41803","name_en":"(Kikkoman 12x20oz Sriracha Sauce","name_cn":"(Kikkoman)是拉差辣椒酱12x20oz/cs","stock":71,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"41804","name_en":"(Kikkoman) Sriracha Sauce 20oz/jar","name_cn":"(Kikkoman)是拉差辣椒酱20oz/jar","stock":118,"unit":"jr","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42000","name_en":"KC Double Black 6cn/cs","name_cn":"双老抽(冠珍) 6罐/csKC","stock":50,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42020","name_en":"PearlRiverBridgeMushroom Sauce12bot/cs","name_cn":"珠江草菇老抽12bot/cs","stock":527,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42042","name_en":"(Haday) Mushroom Dark Soy Sauce 6x1.75L","name_cn":"(海天)草菇老抽6X17.5L","stock":728,"unit":"6btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42110","name_en":"KC Thin Soy Sauce 6cn/cs","name_cn":"生抽(冠珍)","stock":40,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42130","name_en":"(Koon Chun)Potassium Carbonate & Sodium Bicarbonate Solution 12x16.9 floz/cs","name_cn":"(冠珍)雪碱水 12x16.9 floz","stock":68,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42200","name_en":"(LKK) Panda Oyster Sauce 6cn/cs","name_cn":"(LKK) 蠔油李","stock":1088,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42206","name_en":"(LKK) Chung Brand Oyster Sauce 6cn/cs","name_cn":"（中字）蠔油 6罐/箱","stock":1475,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42209","name_en":"(Haday) Premium Signature Oyster Flavoured Sauce 6cn/cs","name_cn":"(海天)醇蚝油 6罐/箱","stock":1405,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42210","name_en":"Kum Chun Oyster Sauce 6cn/cs","name_cn":"锦珍蠔油6cn/cs","stock":3712,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42219","name_en":"(Kum Chun) Oyster Sauce 6x5lb in plastic bottle","name_cn":"锦珍蠔油 (李）塑料罐 6x5lb","stock":2,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42300","name_en":"Sesame Oil 8x0.5GAL/cs","name_cn":"日本麻油 8x0.5GAL/cs","stock":320,"unit":"8btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42310","name_en":"(Kadoya)Sesame Oil 10x0.5GAL/cs","name_cn":"八角麻油10x0.5GAL/cs","stock":106,"unit":"10btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42311","name_en":"(Kadoya)Sesame Oil 0.5GAL/cn","name_cn":"八角麻油 0.5GAL/cn","stock":12,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42400","name_en":"(Amoy)Gold Label Soy Sauce 6cn/cs","name_cn":"淘大金标","stock":1731,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42405","name_en":"(Haday)Golden Label Soy Sauce 6x1.86L","name_cn":"(海天)金标酱油6X1.86L","stock":402,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"42410","name_en":"(LKK) Gold Label Soy Sauce 6cn/cs","name_cn":"(LKK) 金标酱油 6cn/cs","stock":171,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43000","name_en":"44lb Ajinomoto MSG","name_cn":"味精(味之素)  44lb Ajinomoto MSG","stock":7,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43025","name_en":"(美味鮮)MSG 44lb/bg","name_cn":"味精(美味鮮) 44lb/bg MSG","stock":1329,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43102","name_en":"Chicken Bouillon (cn)","name_cn":"太太乐鸡精 (cn)","stock":26,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43112","name_en":"Chicken Bouillon 4cn/cs","name_cn":"太太乐鸡精 4cn/cs","stock":1417,"unit":"4cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43150","name_en":"Mushroom Bouillon 4cn/cs","name_cn":"太太乐蘑菇精 4罐/cs","stock":35,"unit":"4cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43153","name_en":"Mushroom Bouillon 4.5lb","name_cn":"蘑菇精","stock":40,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43200","name_en":"(Kikkoman) Soy Sauce 5GAL","name_cn":"(Kikkoman) 万字酱油 5GAL","stock":1014,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43205","name_en":"(LKK)Less Sodium 5GL","name_cn":"低盐万字(LKK)Less Sodium 5GL/桶","stock":135,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43220","name_en":"(Shinho)Soy Sauce 5GAL","name_cn":"欣和 万字酱油 5GAL","stock":320,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43221","name_en":"(LKK) Soy Sauce 5GAL","name_cn":"(LKK) 万字酱油 5GAL","stock":1057,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43222","name_en":"(LKK) (Kum Chun) Soy Sauce 5GAL","name_cn":"(LKK)錦珍万字5GAL/桶","stock":803,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43260","name_en":"Squid Fish Sauce 12x25oz/cs","name_cn":"鱼露 12x25oz/cs","stock":18,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43261","name_en":"Squid Fish Sauce 25oz/btl","name_cn":"鱼露  25oz/btl","stock":12,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43300","name_en":"(WY) Duck Sauce 5GAL","name_cn":"(WY) 酸梅酱 5GAL","stock":161,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43310","name_en":"(Kari out) Duck Sauce 5GAL","name_cn":"(Kari out) 酸梅酱 5GAL","stock":272,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43400","name_en":"(WY) Thick Soy Sauce 5GAL","name_cn":"(WY) 上珠油 5GAL","stock":104,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43500","name_en":"Mustard Powder 25lb","name_cn":"芥辣粉 25lb","stock":21,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43520","name_en":"Mustard Powder 5lb","name_cn":"芥辣粉 5lb","stock":8,"unit":"5lb/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43670","name_en":"(United) Sugar 50lb","name_cn":"(United) 糖50lb","stock":3650,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43700","name_en":"Salt 50lb","name_cn":"盐 50lb","stock":113,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43800","name_en":"Strawberry Gelatin 12x1.5lb/cs","name_cn":"草莓果冻 12x1.5lb/cs","stock":286,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43801","name_en":"Orange Gelatin 12x1.5lb/cs","name_cn":"柑果冻 12x1.5lb/cs","stock":181,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43802","name_en":"Lemon Gelatin 12x1.5lb/cs","name_cn":"柠檬果冻 12x1.5lb/cs","stock":92,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43803","name_en":"Lime Gelatin 12x1.5lb/cs","name_cn":"青柠果冻 12x1.5lb/cs","stock":79,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43806","name_en":"Grape Gelatin 12x1.5lb/cs","name_cn":"葡萄果冻 12x1.5lb/cs","stock":108,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43807","name_en":"Powder Lyche Gelatin","name_cn":"荔枝果冻 12x1.5lb/cs","stock":87,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43808","name_en":"Mango Gelatin","name_cn":"芒果果冻 12x1.5lb/cs","stock":183,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43833","name_en":"(Super Chef) liquid margarine 2x17.5lb","name_cn":"(Super Chef) 液体牛油 2x17.5lb","stock":257,"unit":"2bkt/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43838","name_en":"(Super Chef) Liquid Margarine 35LB","name_cn":"(Super Chef)液体牛油 35lb/桶","stock":738,"unit":"bkt","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43845","name_en":"(Gold n Sweet)Butter 30x1lb","name_cn":"(Gold n Sweet)牛油 30x1lb","stock":220,"unit":"30pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43878","name_en":"(LV) Cream Cheese 1x30lb","name_cn":"金芝士( LV)-1X30LB/箱","stock":210,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"43892","name_en":"(Baking)Cream Cheese 10x3lb","name_cn":"(Baking)金芝士 10x3lb","stock":278,"unit":"10pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44000","name_en":"(GEL)White Pepper Powder 12x1lb","name_cn":"(GEL)白胡椒粉 12x1lb","stock":8,"unit":"12bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44010","name_en":"(GEL)White Pepper Powder 1lb/cn","name_cn":"(GEL)白胡椒粉 1lb/罐","stock":36,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44014","name_en":"(Imperial)Black Pepper Powder-4lb/cn","name_cn":"(Imperial)黑胡椒粉4LB/罐","stock":67,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44022","name_en":"(Imperial)Black Pepper Powder-6x4LB/cs","name_cn":"(Imperial)黑胡椒粉6x4LB/箱","stock":102,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44045","name_en":"(Imperial) White Pepper Powder 6X5LB","name_cn":"(Imperial)白胡椒粉6x5LB/箱","stock":109,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44046","name_en":"White Pepper -5lb/cn","name_cn":"白胡椒粉(Imperial)-5Lb/罐","stock":62,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44100","name_en":"Minced Garlic   5lb/bg","name_cn":"蒜头米 5lb/bg","stock":57,"unit":"5lb/bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44110","name_en":"Minced Garlic  6x5lb/cs","name_cn":"蒜头米 6x5lb/cs","stock":556,"unit":"30lb/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44141","name_en":"Garlic Powder  6x5lb/cs","name_cn":"蒜头粉 6x5lb/cs","stock":477,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44142","name_en":"Garlic Powder  5lb","name_cn":"蒜头粉 5lb","stock":85,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44200","name_en":"(Rumford)Baking Powder 4lb/cn","name_cn":"(Rumford)发粉 4lb/罐","stock":36,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44201","name_en":"(Rumford)Baking Powder 6x4lb/cs","name_cn":"(Rumford)发粉 6x4lb/cs","stock":88,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44211","name_en":"(Arm&Hammer)Baking Soda 24x1lb/cs","name_cn":"(Arm&Hammer)苏打粉 24x1lb/cs","stock":69,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44213","name_en":"(Arm&Hammer)Baking Soda 1lb/box","name_cn":"(Arm&Hammer)苏打粉 1lb/box","stock":10,"unit":"bx","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44310","name_en":"Red Pepper Powder 5lb","name_cn":"红粉 5lb","stock":11,"unit":"cn","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44311","name_en":"Red Pepper Powder 6x5lb","name_cn":"红粉 6x5lb","stock":3,"unit":"6cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44420","name_en":"Waterchestnut Powder 60x1lb/cs","name_cn":"马蹄粉  60x1lb/cs","stock":29,"unit":"60bx/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44421","name_en":"Waterchestnut Powder 1lb/box","name_cn":"马蹄粉 1lb/盒","stock":64,"unit":"bx","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44500","name_en":"(India) Curry Powder  16oz/cn","name_cn":"(印度)加哩粉 16oz/罐","stock":85,"unit":"btl","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"44510","name_en":"(India)Curry Powder  12x16oz/cs","name_cn":"(印度)加哩粉 12x16oz/cs","stock":88,"unit":"12cn/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45000","name_en":"(WY) Soy sauce Pack 500bg/cs","name_cn":"(WY)酱油包","stock":5191,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45040","name_en":"(Yipin) Soy sauce Pack","name_cn":"(一品)酱油包","stock":3620,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45100","name_en":"(WY) Duck sauce Pack 500bg/cs","name_cn":"(WY) 酸梅包","stock":3499,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45120","name_en":"(Yi Ping) Duck sauce Pack","name_cn":"(一品)酸梅包","stock":2205,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45200","name_en":"(WY) Mustard sauce Pack 500bg/cs","name_cn":"(WY) 芥辣包","stock":645,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45220","name_en":"(Yi Ping) Mustard Sauce Pack","name_cn":"(一品) 芥辣包","stock":440,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45300","name_en":"(WY) Hot sauce Pack 500bg/cs","name_cn":"(WY) H辣椒包","stock":618,"unit":"500bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45320","name_en":"(Yi Ping) Hot Sauce Pack","name_cn":"(一品) 辣椒包","stock":129,"unit":"cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45403","name_en":"Orange Peel 8oz/bg","name_cn":"陳皮-8oz/包","stock":71,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45404","name_en":"Salted Black Bean 16oz/bg","name_cn":"豆豉-16oz/包","stock":35,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45406","name_en":"Dried Chili Pepper 5lb/bg","name_cn":"辣椒干-5LB/包","stock":90,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45413","name_en":"Five Spice Powder 16oz/bg","name_cn":"五香粉-16oz/包","stock":26,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45415","name_en":"Chili Crushed 5lb/bg","name_cn":"碎辣椒干 5lb/bg","stock":50,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45416","name_en":"Szechuan Chili Pepper 12oz/bg","name_cn":"花椒-12oz/包","stock":66,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45424","name_en":"Salted Black Bean 50x16oz/cs","name_cn":"豆豉-50X16oz/箱","stock":4,"unit":"50bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45426","name_en":"Dried Chili Pepper 6x5lb/cs","name_cn":"辣椒干-6X5LB/箱","stock":46,"unit":"6bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45432","name_en":"Five Spice Powder 50x16oz/cs","name_cn":"五香粉 50x16oz/cs","stock":3,"unit":"50bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45441","name_en":"Aniseed  30x16oz/cs","name_cn":"八角30x16oz/箱","stock":5,"unit":"30bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45443","name_en":"Aniseed 16oz","name_cn":"八角 16oz/bg","stock":57,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45448","name_en":"Dried Lir 16oz","name_cn":"甘草 16oz/bg","stock":100,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45449","name_en":"Dried Lir 10oz/bg","name_cn":"甘草 10oz/bg","stock":39,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45453","name_en":"Szechuan Chili Pepper 16oz/bg","name_cn":"花椒 16oz/bg","stock":48,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45482","name_en":"Chili Crushed 6x5lb/cs","name_cn":"碎辣椒干6X5LB/箱","stock":95,"unit":"6bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45501","name_en":"Schredded Black Fungus 5lb/bg","name_cn":"木耳絲-5LB/包","stock":29,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45510","name_en":"Dried Bean Flour Stick  7oz/bg","name_cn":"腐竹-7oz/包","stock":74,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45512","name_en":"Dried Bean Flour Stick 12oz/bg","name_cn":"腐竹","stock":20,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45521","name_en":"Schredded Black Fungus 6x5lb/cs","name_cn":"木耳絲-6X5LB/箱","stock":10,"unit":"6bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45522","name_en":"Dried Mushrooms 6x5lb/cs","name_cn":"香菇6x5lb/箱","stock":42,"unit":"6bg/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45559","name_en":"Dried Lily Flowers  6oz/bg","name_cn":"金針-6oz/包","stock":33,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45565","name_en":"Dried Mushrooms 5lb/bg","name_cn":"厚菇-5LB/包","stock":28,"unit":"bg","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45600","name_en":"Salt Pack 3000pk","name_cn":"鹽包-3000包/箱","stock":5,"unit":"3000pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45610","name_en":"Sugar Pack 2000pk","name_cn":"糖包-2000包/箱","stock":38,"unit":"2000pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45611","name_en":"Diet Sugar Pack 2000pk","name_cn":"減肥糖包-2000包/箱","stock":99,"unit":"2000pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45620","name_en":"Pepper Pack 3000pk","name_cn":"胡椒包-3000包/箱","stock":12,"unit":"3000pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45630","name_en":"Tartar Sauce Pack 200pk","name_cn":"它它包-200包/箱","stock":11,"unit":"200pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45642","name_en":"Ketchup Pack 1000pk","name_cn":"番茄包(Hunts)-1000包/箱","stock":56,"unit":"1000pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45652","name_en":"Ice Tea Bag (96 packs)","name_cn":"冰茶包-96包/箱","stock":589,"unit":"96pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"45657","name_en":"Chinese Tea Bags (600 packs)","name_cn":"烏龍茶包(K)-600包/箱","stock":259,"unit":"600pk/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"46000","name_en":"Sweet Rice Pudding 12btl/cs","name_cn":"酒釀-12瓶X16oz/箱","stock":51,"unit":"12btl/cs","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"46010","name_en":"Red Yeast 14oz","name_cn":"紅曲-14oz/包","stock":101,"unit":"pk","cat_cn":"🧄 调味品","cat_en":"🧄 Sauces"},{"code":"50013","name_en":"Bamboo Shoot Slice","name_cn":"笋片(象王牌) 6罐/cs","stock":115,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"50019","name_en":"(Fi Hood)Bamboo Shoot Slice 6cn/cs","name_cn":"笋片(Fi Hood)","stock":1025,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"50113","name_en":"(Fi Hood)Bamboo Shoot Half 6cn/cs","name_cn":"筍塊(Fi Hood)-6罐/箱","stock":372,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"50214","name_en":"(Fi Hood) Bamboo Shoot Stripe 6cn/cs","name_cn":"笋丝(Fi Hood) 6罐/cs","stock":1314,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"50308","name_en":"(Fi Hood)Bamboo Shoot Dice 6cn/cs","name_cn":"笋丁(Fi Hood)","stock":193,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"51028","name_en":"Weterchestnut SIice 6cn/cs","name_cn":"清水马蹄片(Fi Hood) 6罐/cs","stock":386,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"51121","name_en":"(Fi Hood)Weterchestnut Dice 6cn/cs","name_cn":"清水马蹄丁(Fi Hood)","stock":427,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"52201","name_en":"Golden Mushrooms 24cn/cs","name_cn":"金針菇-24罐/箱","stock":13,"unit":"24cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"52211","name_en":"Golden Mushrooms 15oz/cn","name_cn":"金針菇-15oz/罐","stock":17,"unit":"cn","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"53008","name_en":"(Nature pro) Cut Corn 6cn/cs","name_cn":"切玉米(极品)","stock":584,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"53041","name_en":"(Elephant King) Whole Baby Corn 6cn/cs","name_cn":"整枝玉米(象王)","stock":122,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"53050","name_en":"Petite COB Corn 96ctn.","name_cn":"3寸冻玉米段","stock":646,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"53060","name_en":"Frozen Corn Kernel 20lb","name_cn":"冻玉米粒 20LB/箱","stock":1217,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54010","name_en":"(Dole)Pineapple Juice 12cn/cs","name_cn":"菠萝水(DOLE)","stock":4,"unit":"12cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54012","name_en":"Pineapple Juice (Duchess) 12x46oz/cs","name_cn":"菠萝水 (Duchess) 12x46oz/箱","stock":171,"unit":"12cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54015","name_en":"(Nature Pro)Pineapple Chunk 6cn/cs","name_cn":"菠萝角(极品)","stock":679,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54022","name_en":"Lemon Juice 4x1GL","name_cn":"柠檬水4X1GAL/箱","stock":53,"unit":"4bg/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54038","name_en":"(Chaokoh)Coconut milk 24x13.5oz/cs","name_cn":"椰子奶(Chaokoh)24X13.5oz/箱","stock":93,"unit":"24cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54040","name_en":"(Sun Voi)Coconut milk 24x13.5oz/cs","name_cn":"椰子奶(象阳)24X13.5oz/箱","stock":185,"unit":"24cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54061","name_en":"(Indian Summer) Pineapple Juice 12X46oz/cs","name_cn":"(Indian Summer菠萝水12X46oz/箱","stock":297,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54100","name_en":"(Hunts)Ketchup 6cn/cs","name_cn":"(Hunts)番茄酱-6罐/箱","stock":574,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54101","name_en":"(IPS)Ketchup 6cn/cs","name_cn":"(IPS)番茄酱 6罐/cs","stock":224,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54104","name_en":"(Del Sol) Tomatillos Whole 6/#10 cans","name_cn":"(Del Sol)綠蕃茄(整個)6罐/箱","stock":347,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54105","name_en":"Whole Peel Tomato 6cn/cs","name_cn":"去皮红番茄(整个) 6罐/cs","stock":2186,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54106","name_en":"(Del Sol) Jalapenos Nacho Sliced 6/#10 cans","name_cn":"(Del Sol)墨西哥辣椒片醬(切片)6罐/箱","stock":106,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54107","name_en":"(San Benito)濃蕃茄泥6罐/箱Tomato Heavy Puree","name_cn":"(San Benito)濃蕃茄泥6罐/箱Tomato Heavy Puree","stock":935,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54108","name_en":"(Del Sol) Whole Jalapenos in 6/#10 cans","name_cn":"(Del Sol)墨西哥辣椒醬(整粒)6罐/箱","stock":152,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54110","name_en":"Tomato Juice 12cn/cs","name_cn":"番茄水-12罐/箱","stock":153,"unit":"12cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54344","name_en":"Peach Slice(Chui Ho/Always the best) 6cn/cs","name_cn":"桃罐(最好/恒泰) 6罐/cs","stock":389,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54369","name_en":"(Fi Hood)Pear Slice 6cn/cs","name_cn":"梨罐(FiHood)   6罐/cs","stock":28,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54383","name_en":"(Fi Hood)Peach Slice 6cn/cs","name_cn":"桃罐(FiHood) 6罐/cs","stock":682,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54399","name_en":"(FiHood)Mandarin slice 6cn/cs","name_cn":"桔罐(FiHood) 6罐/cs","stock":767,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54465","name_en":"(Cafe Classics)Tapioca Pudding 6cn/cs","name_cn":"西米露布丁(Cafe Classics)","stock":37,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54480","name_en":"(RealFresh)Vanilla Pudding 6cn/cs","name_cn":"香草布丁(RealFresh)","stock":49,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54481","name_en":"(RealFresh)Chocolate Pudding 6cn/cs","name_cn":"巧克力布丁(RealFresh)","stock":60,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"54482","name_en":"(RealFresh)Banana Pudding 6cn/cs","name_cn":"香蕉布丁(RealFresh)","stock":69,"unit":"6cn/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55000","name_en":"Peanut 5lb","name_cn":"花生5lb","stock":46,"unit":"5lb/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55020","name_en":"Peanut 6x5lb","name_cn":"花生 6x5lb","stock":202,"unit":"6bg/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55113","name_en":"(WW320) Cashewnut 10X5lb","name_cn":"腰果(WW320) 10X5lb/cs","stock":68,"unit":"10bg/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55114","name_en":"(WW320) Cashewnut 5lb/bg","name_cn":"腰果 (WW320) 5lb/bg","stock":32,"unit":"5lb/bg","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55300","name_en":"Sesame Seeds 5lb","name_cn":"芝麻 5lb","stock":86,"unit":"5lb/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55310","name_en":"Sesame Seeds 6x5lb","name_cn":"芝麻 6x5lb","stock":17,"unit":"6bg/cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55521","name_en":"Pinto Beans 50lb","name_cn":"斑豆 50lb/bg","stock":1119,"unit":"bg","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"55568","name_en":"Black Beans 50lb","name_cn":"黑豆 50lb/bg","stock":93,"unit":"bg","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"60000","name_en":"18inPlastic Foil 914","name_cn":"914保鲜纸(18寸)","stock":2232,"unit":"rl","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60001","name_en":"12inPlastic Film 910","name_cn":"910保鲜纸(12寸)","stock":2657,"unit":"rl","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60010","name_en":"24inPlastic Foil 916","name_cn":"916保鲜纸(24寸)","stock":1787,"unit":"rl","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60020","name_en":"18inAluminum Foil 614","name_cn":"614银纸(18寸)","stock":44,"unit":"rl","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60050","name_en":"Big  Clear  Wrap 4 rolls/cs","name_cn":"捆纸","stock":414,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60060","name_en":"Tape","name_cn":"透明胶布","stock":4,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60120","name_en":"633 N1100 Short Fold","name_cn":"短纸巾 633 N1100 Short Fold","stock":268,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60210","name_en":"611 N1000 Tall Fold","name_cn":"长纸巾 611 N1000 Tall Fold","stock":950,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60317","name_en":"NP1717 1ply Napkin 4000pc/cs","name_cn":"NP1717 堂吃纸巾 单张 4000pc/cs","stock":142,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60320","name_en":"5281 N1500 Dinner Napkin","name_cn":"堂吃紙巾-5281-N1500-雙層","stock":284,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60351","name_en":"16.5x21 Easy Dispenser Napkin 500x12pk","name_cn":"桌面抽紙500X12張","stock":290,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60426","name_en":"Super 101 White roll Toilet 350 12 roll/cs","name_cn":"Super 101 白色机装抹手纸 12 roll/cs","stock":129,"unit":"12rl/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60446","name_en":"brown roll Towel J4700 12rl/cs","name_cn":"棕色机装抹手纸 J4700 12捆/cs","stock":1098,"unit":"12rl/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60503","name_en":"Toilet Tissue 2025","name_cn":"机装厕所纸Nova 2025 12捆/cs","stock":3,"unit":"12rl/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60522","name_en":"Bath Tissue 96ctn.","name_cn":"厕所纸 96粒/cs","stock":786,"unit":"96ctn/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60528","name_en":"Tissue roll Cascades Pro 12rl/cs","name_cn":"机装厕所纸 Cascades Pro 12捆/cs","stock":10,"unit":"12rl/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60551","name_en":"Toilet Tissue 129X","name_cn":"机装厕所纸 (129X) 12捆/cs","stock":2154,"unit":"12rl/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60616","name_en":"Check Book","name_cn":"开单簿(第一)","stock":242,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60618","name_en":"Chinese Zodiac 700pc/cs","name_cn":"十二生肖纸(佳乐) 700张/cs","stock":19,"unit":"700pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"60637","name_en":"Ea Egg Tart Crust","name_cn":"蛋撻壳 64个/cs","stock":25,"unit":"64pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61020","name_en":"2# Brown Bag 500pc","name_cn":"2# 纸袋 500pc","stock":71,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61040","name_en":"4# Brown Bag 500pc","name_cn":"4# 纸袋 500pc","stock":112,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61060","name_en":"6# Brown Bag 500pc","name_cn":"6# 纸袋 500pc","stock":98,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61080","name_en":"8# Brown Bag 500pc","name_cn":"8# 纸袋500pc","stock":440,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61120","name_en":"12#Brown Bag","name_cn":"12#纸袋 500/bg","stock":250,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61160","name_en":"16# Brown Bag 500pc","name_cn":"16# 纸袋 500pc","stock":146,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61200","name_en":"20# Brown Bag 500pc","name_cn":"20# 纸袋500pc","stock":546,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61210","name_en":"1/8# Brown Bag 500pc","name_cn":"1/8# 纸袋 500pc","stock":366,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61220","name_en":"1/6# Brown Bag 500pc","name_cn":"1/6#纸袋 500pc","stock":96,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61230","name_en":"25# Brown Bag 500pc","name_cn":"25#纸袋 500pc","stock":20,"unit":"500pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61300","name_en":"Small Paper Shopping Bag","name_cn":"小抽","stock":47,"unit":"250pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61320","name_en":"Senior Paper Shipping Bag","name_cn":"大抽","stock":27,"unit":"250pc/pk","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61400","name_en":"(Kari out) 1/2lb Glassine Bags 1000pc/box","name_cn":"(佳利)1/2lb春卷袋 1000pc/box","stock":137,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61401","name_en":"(Kari out) 1/2lb Glassine Bags 12bx/cs","name_cn":"(佳利)1/2lb春卷袋 12bx/cs","stock":39,"unit":"12bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61404","name_en":"(Yi Ping) 1/2lb Glassine Bags 1000pc/box","name_cn":"(一品) 1/2lb春卷袋 1000pc/box","stock":16,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61405","name_en":"(Yi Ping) 1/2lb Glassine Bags 12bx/cs","name_cn":"(一品) 1/2lb 春卷袋12bx/cs","stock":52,"unit":"12bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61410","name_en":"(Kari out) 1lb Glassine Bags 1000pc/box","name_cn":"(佳利)1lb春卷袋 1000pc/box","stock":33,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61411","name_en":"(Kari out) 1lb Glassine Bags 8bx/cs","name_cn":"(佳利)1lb春卷袋  8bx/cs","stock":26,"unit":"8bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61414","name_en":"(Yi Ping) 1lb Glassine Bags 1000pc/box","name_cn":"(一品)1lb春卷袋 1000pc/box","stock":23,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61415","name_en":"(Yi Ping) 1lb Glassine Bags 8bx/cs","name_cn":"(一品) 1lb春卷袋 8bx/cs","stock":8,"unit":"8bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61420","name_en":"(Kari out) 2lb Glassine Bags 1000pc/box","name_cn":"(佳利)2lb春卷袋 1000pc/box","stock":49,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61421","name_en":"(Kari out) 2lb Glassine Bags 6bx/cs","name_cn":"(佳利)）2lb春卷袋 6盒/箱","stock":12,"unit":"6bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61424","name_en":"(Yi Ping) 2lb Glassine Bags 1000pc/box","name_cn":"(一品)2lb春卷袋 1000pc/box","stock":27,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61425","name_en":"(Yi Pin) 2lb Glassine Bags 6bx/cs","name_cn":"2lb春卷袋(一品) 6盒/cs","stock":17,"unit":"6bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61430","name_en":"(Kari out) 3lb Glassine Bags 1000pc/box","name_cn":"(佳利) 3lb 春卷袋1000pc/box","stock":134,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61432","name_en":"(Yi Ping) 3lb Glassine Bags 1000pc/box","name_cn":"(一品) 3lb春卷袋 1000pc/box","stock":165,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61440","name_en":"(Kari out) 4lb Glassine Bags 1000pc/box","name_cn":"(佳利) 4lb春卷袋 1000pc/box","stock":76,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61441","name_en":"(Yi Ping) 4lb Glassine Bags 1000pc/box","name_cn":"一品) 4lb 春卷袋1000pc/box","stock":71,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"61500","name_en":"Pint Foil Bag 1000pc/box","name_cn":"小排骨袋1000pc/box","stock":18,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62000","name_en":"Small T Shirt Plastic Bags","name_cn":"白小胶袋","stock":2319,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62010","name_en":"Large T Shirt Plastic Bags","name_cn":"白大胶袋","stock":1686,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62014","name_en":"(Thick)Happy Face Bag","name_cn":"(MHF13)#1/8白小胶袋300","stock":61,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62015","name_en":"(LHF20-IN) Thick #1/6 Happy Face Bags 200pc/cs","name_cn":"(LHF20-IN) #1/6白大胶袋200張","stock":344,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62040","name_en":"46 GAL Liner Trash Bag","name_cn":"46 垃圾袋","stock":2272,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"62050","name_en":"10x8x24 Plastic Bag","name_cn":"白透明袋(普)","stock":741,"unit":"bg","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63013","name_en":"1oz(Portion) Souffle Cup 2500pc","name_cn":"1oz芥辣杯(Portion)  2500/cs","stock":25,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63023","name_en":"1oz(Portion) Souffle Lids 2500pc","name_cn":"1oz芥辣盖 (Portion) 2500/cs","stock":12,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63123","name_en":"2oz  Souffle Cup 2500pc","name_cn":"2oz芥辣杯 2500/cs","stock":91,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63125","name_en":"2oz(Portion) Souffle Lids 2500pc","name_cn":"2oz芥辣盖2500pc","stock":125,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63126","name_en":"2oz(Portion) Souffle Cups 2000pc","name_cn":"2oz芥辣杯 2000pc","stock":10,"unit":"2000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63127","name_en":"2oz(Portion) Souffle Lids 2000pc","name_cn":"2oz芥辣盖 2000pc","stock":5,"unit":"2000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63210","name_en":"4oz Souffle Solo cups 2500pc","name_cn":"4oz芥辣杯 Solo 2500/cs","stock":50,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63216","name_en":"4oz Dart Soup Cup (4J6) 1000pc","name_cn":"4oz 汤杯Dart (4J6) 1000pc","stock":24,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63218","name_en":"4oz  Soffle Lids 2500pc","name_cn":"4oz芥辣盖  2500pc","stock":50,"unit":"2500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63226","name_en":"6JL Dart Contaner Lids","name_cn":"6JL盖","stock":60,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63310","name_en":"8oz(8J8) Dart Cups 1000pc","name_cn":"8oz白水杯 (8J8)-1000pc/箱","stock":5,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63313","name_en":"8oz(8SJ20) Dart Cups 1000pc","name_cn":"8oz汤杯(8SJ20)- 1000pc/箱","stock":187,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63320","name_en":"8SL/8JL Dart Cup Lid 1000pc","name_cn":"8SL/8JL 盖 1000pc","stock":6,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63323","name_en":"20JL Dart Container Lid 1000pc","name_cn":"20JL 盖 1000pc","stock":180,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63410","name_en":"12oz(12J16) Dart Cups 1000pc","name_cn":"12oz白水杯(12J16)-1000pc/箱","stock":15,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63413","name_en":"12oz(12SJ20) Dart Cups 500pc","name_cn":"12oz湯杯~(12SJ20)-500/箱","stock":42,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63420","name_en":"16SL Dart Cup Lid 1000pc","name_cn":"16SL 盖 1000pc","stock":250,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63421","name_en":"12SL Dart Cup Lid 1000pc","name_cn":"12SL盖1000pc","stock":8,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63510","name_en":"16oz(16J16) Dart Cups 1000pc","name_cn":"16oz 白水杯(16J16)- 1000/箱","stock":167,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63610","name_en":"20oz(20J16) Dart Cup 500pc","name_cn":"20oz 白水杯(20J16)- 500pc/箱","stock":135,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63613","name_en":"24oz (24J16) Dart Cup 500pc","name_cn":"24oz白水杯~(24J16) 500/cs","stock":30,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63710","name_en":"32oz(32TJ32) Dart Cups 500pc","name_cn":"32oz白水杯(32TJ32) - 500pc/箱","stock":24,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"63720","name_en":"32SL Dart Cup Lid 1000pc","name_cn":"32SL 盖 1000pc","stock":17,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64102","name_en":"7in Round Aluminum Tray 500pc/cs","name_cn":"7寸圆锡盘 500pc/cs","stock":89,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64110","name_en":"7089(Kari out)Oblong Aluminum Tray 500pc","name_cn":"7089锡盘(中美)500pc","stock":27,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64120","name_en":"758(Kari out) Oblong Aluminum Tray 500pc","name_cn":"758锡盘(中美) 500pc","stock":51,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64210","name_en":"70892(Kari out)Lid 500pc","name_cn":"70892盖(中美) 500pc","stock":76,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64217","name_en":"7in Round Aluminum Lid 500pc/cs","name_cn":"7寸圆锡盘盖 500pc/cs","stock":57,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64310","name_en":"W7 23 23oz White Round Mic.Containers 150pc","name_cn":"圆W7 23白底胶盒 150pc","stock":60,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64311","name_en":"W7 23B 23oz Black Round Mic.Containers 150pc","name_cn":"圆W7 23黑底胶盒 150pc","stock":42,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64338","name_en":"C7 21/23B Black Round Mic.Containers 150pc","name_cn":"圆C7 21/23黑底胶盒 150pc","stock":412,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64339","name_en":"C7 21/23 White Round Mic.Containers 150pc","name_cn":"圆C7 21/23白底胶盒 150pc","stock":323,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64502","name_en":"86 30 30oz Square White Mic.Containers 150pc","name_cn":"86 30 30oz方椭圆白底胶盒 150pc","stock":514,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64516","name_en":"86 30 30oz Square Black Mic.Containers 150pc","name_cn":"86 30 30oz 方椭圆黑底胶盒 150pc","stock":1099,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64520","name_en":"9625W 25oz Square White Mic.Containers 150pc","name_cn":"9625W 25oz 方椭圆白底胶盒 150pc","stock":50,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64522","name_en":"9625B 25oz Square Black Mic.Containers 150pc","name_cn":"9625B 25oz  方椭圆黑底胶盒 150pc","stock":48,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64523","name_en":"9635B 35oz Square Black Mic.Containers 150pc","name_cn":"9635B 35oz  方椭圆黑底胶盒150pc","stock":44,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64526","name_en":"86 23/25 Square White Mic.Containers 150pc","name_cn":"86 23/25方椭圆白底胶盒 150pc","stock":645,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64533","name_en":"86 23/25 Square Black Mic.Containers 150pc","name_cn":"86 23/25 方椭圆黑底胶盒 150pc","stock":1239,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64610","name_en":"616W 16oz White Round Mic.Containers 150pc","name_cn":"616W 16oz圆白底胶盒 150pc","stock":66,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"64612","name_en":"616B 16oz Black Round Mic.Containers 150pc","name_cn":"616B 16oz 圆黑底胶盒 150pc","stock":56,"unit":"150pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65006","name_en":"M205(DARNEL)Foam Containers 200pc","name_cn":"M205浅白(DARNEL) 200pc","stock":45,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65105","name_en":"M206(Darnel) Foam Containers 200pc","name_cn":"M206(Darnel) Foam Containers 200pc","stock":309,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65118","name_en":"Foam Cotainers ECOPAX 206","name_cn":"206浅白(ECOPAX)9.25X6.5X2.25 200/cs","stock":578,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65225","name_en":"225 container (Ceres)-500pc/cs","name_cn":"225三明治盒(Ceres) 500/cs","stock":723,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65301","name_en":"23300(GENPAK) Foam Containers 200pc","name_cn":"23300(GENPAK) 三格盒200pc","stock":137,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65303","name_en":"SN203(GENPAK) Containers","name_cn":"SN203(GENPAK) 三格盒 9.25X9.25 200/cs","stock":214,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65304","name_en":"241 Containers","name_cn":"241(福)三隔盒 200/cs","stock":375,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65318","name_en":"23300  Containers","name_cn":"23300三格盒(k)熊猫大 200/cs","stock":546,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65319","name_en":"22310 Containers","name_cn":"22310三隔盒(k)小 200/cs","stock":1325,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65320","name_en":"SN243(GENPAK) Foam Containers 200pc","name_cn":"SN243三隔盒(GENPAK)  200pc","stock":388,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65322","name_en":"SN240 8.25x8x3(GENPAK) 200/cs Containers","name_cn":"SN240 无隔泡沫方盒8.25x8x3(GENPAK) 200/cs","stock":438,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65323","name_en":"SN200  Containers","name_cn":"SN200无隔泡沫方盒 9.25x9.25(GENPAK) 200/cs","stock":127,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65333","name_en":"DF2430(DOLCO) 200/cs  Containers","name_cn":"DF2430三隔盒(DOLCO) 200/cs","stock":541,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65335","name_en":"DF2200 / PS2200 (DOLCO) 200/cs Containers","name_cn":"DF2200 / PS2200 (DOLCO) 200/cs","stock":180,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65336","name_en":"DF2230 (DOLCO) 200/cs Containers","name_cn":"DF2230三隔盒(DOLCO) 200/cs","stock":2173,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65349","name_en":"S 3 Darnel foam container 200/cs","name_cn":"S 3三隔盒 200/cs","stock":106,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65362","name_en":"23300 Containers 200pc/cs","name_cn":"23300三隔盒9.25X8X2.75 (福)大 200/c","stock":657,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65389","name_en":"SN243B-3L(GENPAK)Black Foam Containers 200pc/cs","name_cn":"SN243B黑-3L 8.25X8三隔盒(GENPAK)-2","stock":292,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65390","name_en":"22310 3 Compartment (Ecopax)","name_cn":"22310小三隔盒(Ecopax) 200/cs","stock":286,"unit":"200pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65400","name_en":"80900&80901(GENPAK)  Round Foam Plates 500pc","name_cn":"80900&80901(GENPAK)  9寸纸盘 500pc","stock":153,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"65410","name_en":"83900(GENPAK) Foam 3 Compartment Tray","name_cn":"83900(GENPAK) 三隔9寸盘","stock":133,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66004","name_en":"8 Food Pail 1000pc","name_cn":"8饭PT(GW)花 1000pc","stock":86,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66016","name_en":"C 8 Soup Container  240/set","name_cn":"C 8胶P 240/set","stock":23,"unit":"240pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66020","name_en":"8PT(WY) Soup Container 240pc Cup&Lids","name_cn":"8胶PT(华)240pc","stock":141,"unit":"240pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66023","name_en":"8PT (福) Food Pail 500pc","name_cn":"8饭PT花(福)-500/箱","stock":98,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66100","name_en":"16PT(FP)Food Pail 500pc","name_cn":"16饭PT花(FP)  500pc","stock":269,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66110","name_en":"16PT (福) food pail 500pc","name_cn":"16饭PT花(福) 500/cs","stock":539,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66120","name_en":"16PT(WY) Soup Container","name_cn":"16胶PT(华)","stock":172,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66204","name_en":"26QT(GW) Food Pail 500pc","name_cn":"26饭QT(GW)花 500/cs","stock":17,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66208","name_en":"26QT(福) Food Pail 500pc","name_cn":"26饭QT花(福) 500/cs","stock":192,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66304","name_en":"32QT(GW) Food Pail 500pc","name_cn":"32饭QT(GW)花 500/cs","stock":9,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66305","name_en":"32QT(福) Food Pail 500pc","name_cn":"32饭QT花(福)  500/cs","stock":268,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66320","name_en":"32QT(WY) Soup Container Combo","name_cn":"32胶QT(华)","stock":111,"unit":"500pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"66342","name_en":"24QT(WY) Soup Container Combo 240pc","name_cn":"24胶QT(华) 240/cs","stock":53,"unit":"240pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67000","name_en":"WY Plastic Forks","name_cn":"叉(华) 1000","stock":474,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67006","name_en":"Plastic Forks 1000pc","name_cn":"叉(佳乐) 1000/cs","stock":1425,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67026","name_en":"Plastic Spoon","name_cn":"汤勺(佳乐) 1000/cs","stock":1035,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67033","name_en":"(Q603) Plastic Wrapped Spoon 1000pc/cs","name_cn":"(Q603)更 独立包装 1000/cs","stock":23,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67041","name_en":"Plastic Knife 1000pc","name_cn":"胶刀 1000/盒","stock":67,"unit":"1000pc/bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67079","name_en":"(Q602) Plastic Wrapped Fork 1000pc/cs","name_cn":"(Q602)叉 独立包装 1000/cs","stock":170,"unit":"1000pc/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67100","name_en":"6inBamboo Skewer (box)","name_cn":"6寸竹签 (小盒)","stock":16,"unit":"bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67110","name_en":"8inBamboo Skewer (box)","name_cn":"8寸竹签 (小盒)","stock":28,"unit":"bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67120","name_en":"Toothpick 24bag/box","name_cn":"牙签 (24小盒)","stock":12,"unit":"24bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67140","name_en":"6inBamboo Skewer 20box/cs","name_cn":"6寸竹签(佳) -20盒/箱","stock":122,"unit":"20bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67141","name_en":"8inBamboo skewer 20box/cs","name_cn":"8寸竹签 (佳乐) 20盒/cs","stock":12,"unit":"20bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67200","name_en":"Straws (box)","name_cn":"吸管 盒","stock":6,"unit":"bx","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67211","name_en":"Chopstick","name_cn":"红筷 (双喜8)","stock":247,"unit":"cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"67257","name_en":"Wrapped Straws","name_cn":"吸管(FiHood) 24x400pc/cs","stock":195,"unit":"24bx/cs","cat_cn":"📦 包装用品","cat_en":"📦 Packaging"},{"code":"70002","name_en":"Lucky Rice 50lb","name_cn":"大三元 50lb/bg","stock":3197,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70003","name_en":"(Purple Dragon) Long Grain Rice 50lb","name_cn":"(Purple Dragon) 长苗米 50lb/bg","stock":1379,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70102","name_en":"(Rice King) Jasmine Rice 20lb","name_cn":"米王香米(A) 20lb","stock":2748,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70105","name_en":"(LFY) Jasmine rice 22lb/bg","name_cn":"(龍鳳園)香米22lb","stock":1993,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70138","name_en":"Fu Thai Jasmine Rice 44lb","name_cn":"福泰香米 44lb","stock":1323,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70202","name_en":"50lb Yellow Kokuho Rice","name_cn":"50lb 黄国宝米(中粒)","stock":623,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70207","name_en":"15lb Yellow Kokuho Rice","name_cn":"15lb 黄国宝米(中粒)","stock":76,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70210","name_en":"50lb Nishiki SushiRice","name_cn":"50lb 锦字锦米(中粒)","stock":80,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70211","name_en":"Botan SushiRice 50lb","name_cn":"50lb 富贵花锦米(中粒)","stock":40,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70220","name_en":"(FOO) Sushi Rice 50lb","name_cn":"富壽司米(FOO) 50lb/bg","stock":40,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70238","name_en":"(Fortune) Sushi Rice 50lb/bg","name_cn":"福之米錦米 50lb/bg","stock":1023,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70255","name_en":"(EastSide) Brown Rice 50lb","name_cn":"(EastSide) 糙米 50lb/bg","stock":5,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70256","name_en":"(Rice King)Brown Rice 50lb/bg","name_cn":"糙米(米王) 50lb/bg","stock":15,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70315","name_en":"(Green Elephant) LongGrain Sweet Rice 50lb","name_cn":"(绿象)长糯米 50lb","stock":18,"unit":"50lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70354","name_en":"(LOTUS) Sweet Rice 8X5lb","name_cn":"圓糯米(上選) 8x5lb/bg","stock":431,"unit":"8bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"70355","name_en":"Lotus Sweet Rice 5lb/bg","name_cn":"圓糯米(上選) 5lb/bg","stock":75,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71000","name_en":"Admiration Oil 35lb","name_cn":"A小胶油 35lb","stock":2194,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71004","name_en":"(Sunflower) Shortening Oil 35LB","name_cn":"(Sunflower) 炸油35LB","stock":5507,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71009","name_en":"Super A Soybean Oil 35lb","name_cn":"Super A 油 35lb","stock":1277,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71022","name_en":"(Sunflower) Clear Fry Oil 35LB","name_cn":"(Sunflower) C油35LB","stock":2919,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71026","name_en":"(CMC)35lb Clear Fry Oil","name_cn":"(CMC) 35lb C油","stock":2396,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"71047","name_en":"(CMC)35lb Shortening Fry oil","name_cn":"(CMC)35lb 炸油","stock":1198,"unit":"bkt","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72000","name_en":"2x25lb Five Star H&R Flour","name_cn":"2x25lb 五星面粉","stock":754,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72007","name_en":"(North Dakotamill)Flour  50lb/bg","name_cn":"面粉(North Dakotamill) 50lb/bg","stock":799,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72011","name_en":"(Tate & Lyle)Cornstarch 50lb/bg","name_cn":"(AE)生粉(Tate & Lyle)","stock":995,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72013","name_en":"(Levo)Cornstarch 50lb/bg","name_cn":"(Levo)生粉50LB","stock":2189,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72014","name_en":"(Torino) 50lb Corn starch","name_cn":"生粉(Torino) 50lb/bg","stock":830,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72020","name_en":"(Panda)44.09lb Potato Starch","name_cn":"超级生粉(熊猫)44.09lb","stock":2702,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72039","name_en":"Janpanese Bread Crumb(Newly Wed) 20lb","name_cn":"中粗面包粉((Newly Wed)  20lb","stock":852,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72065","name_en":"(Ardent) Flour 50lb/bg","name_cn":"(Ardent) 面粉  50lb/bg","stock":557,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"72100","name_en":"(Royal Lion) Potato Starch 44lb","name_cn":"超级生粉(Royal Lion) 44lb","stock":1239,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73001","name_en":"(Elite) Kong Moon Rice Noodle  400g/bg","name_cn":"(合燕)江门米粉 400g/bg","stock":59,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73011","name_en":"(Elite)Chao Ching Rice Stick 400g/bg","name_cn":"(合燕)肇庆米粉 400g/包","stock":81,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73013","name_en":"(Elite)Kong Moon Rice Stick 60bagx400g/cs","name_cn":"江门米粉(合燕牌) 60bagx400g/cs","stock":888,"unit":"60bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73015","name_en":"(Elite)Chao Ching Rice Stick 60bagx400g/cs","name_cn":"(合燕)肇庆米粉  60bagx400g/cs","stock":286,"unit":"60bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73111","name_en":"Glutinous Rice Flour 1lb/bg","name_cn":"糯米粉 1lb/bg","stock":22,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73113","name_en":"Glutinous Rice Flour 24x1lb/cs","name_cn":"(飞马牌)糯米粉 24x1lb/cs","stock":43,"unit":"24bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73114","name_en":"Rice Powder  24x1lb/cs","name_cn":"(飞马牌)粘米粉 24x1lb/cs","stock":16,"unit":"24bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73123","name_en":"Rice Powder  1lb/bg","name_cn":"粘米粉 1lb/bg","stock":55,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73200","name_en":"Thick Rice Stick  1lb/bg","name_cn":"(桐口)粉干  1lb/bg","stock":39,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73201","name_en":"Oriental Style Noodle (Bag)","name_cn":"沙河粉(M)","stock":7,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73203","name_en":"Amoy Flour Noodle (Box) 300 grams","name_cn":"线面 /盒","stock":23,"unit":"bx","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73220","name_en":"Thick Rice Stick 40bags/cs","name_cn":"粉干(桐口)40包/箱","stock":1,"unit":"40bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73234","name_en":"Vermicelli Bean Thread 50bagX17.6oz/cs","name_cn":"龙口粉丝 50包X17.6oz/cs","stock":16,"unit":"50bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73259","name_en":"(Chefins Choice)10mm (XL)Rice Stick 30x12oz/cs","name_cn":"沙河粉(Chefins Choice)10mm (XL)30X12oz","stock":38,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73265","name_en":"(GhefsChoice) 3mm(M) RiceStick 30x12oz/cs","name_cn":"沙河粉(Ghef‘sChoice) 3mm(M)   30x12oz/cs","stock":39,"unit":"30bg/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"73283","name_en":"Vermicelli Bean Thread 17.6oz/bg","name_cn":"龙口粉丝 17.6oz/bg","stock":86,"unit":"bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74000","name_en":"(TG) Noodle 5lb/bg","name_cn":"蛋面（美）5lb/bg","stock":1426,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74001","name_en":"Lo Mein Noodle (GB) 5lb/bg","name_cn":"面(西) 5lb/bg","stock":1988,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74015","name_en":"(Dai Sing) Thick Popular Noodle 20lb/cs","name_cn":"广东干面粗(大升) 20lb/cs","stock":146,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74028","name_en":"(Lucky)Egg Noodle  5lb/bg","name_cn":"面(美味) 5lb/bg","stock":1845,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74034","name_en":"(Golden Bowl) Medimum Dry noodle 18lb","name_cn":"广东干面(金碗)粗","stock":1636,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74035","name_en":"(Golden Bowl) Small Dry noodle 18lb","name_cn":"广东干面(金碗)细","stock":916,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74080","name_en":"Dai Sing Lo Mein 5lb/bg","name_cn":"全蛋捞面(大升)粗 5lb/bg","stock":113,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74093","name_en":"Baily Dry Medimum Noodle  30lb/cs","name_cn":"广东干面(百利) (M)","stock":49,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74100","name_en":"TG 7x7 Thin Egg roll Skin 5lb/bg","name_cn":"薄皮(美)7寸 5lb/bg","stock":1238,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74101","name_en":"TG 7x7 Thick Egg roll Skin 5lb/bg","name_cn":"厚皮(美)7寸 5lb/bg","stock":1203,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74103","name_en":"TG 5.5x5.5 Egg roll Skin 5lb/bg","name_cn":"5.5寸皮(美) 5lb/bg","stock":742,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74143","name_en":"Baily Regular Egg roll Skin 30lb","name_cn":"春卷皮7寸(百利)30lb","stock":230,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74150","name_en":"(Lucky) 7in Egg roll Skin 5lb/bg","name_cn":"春卷皮7寸(美味)5lb/bg","stock":810,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74152","name_en":"(Lucky) 6in Egg roll Skin 5lb/bg","name_cn":"春卷皮6寸(美味) 5lb/bg","stock":719,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74200","name_en":"TG Wonton Skin 5lb/bg","name_cn":"云皮(美) 5lb/bg","stock":798,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74208","name_en":"(Dai Sing) Wonton Skin 8pk/cs","name_cn":"云皮(大升) 8pk/cs","stock":9,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74243","name_en":"Baily Regular Wonton Skin 30lb","name_cn":"云皮(百利) 30lb","stock":150,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74280","name_en":"(Lucky) Wonton Skin 5lb/bg","name_cn":"(美味)云皮 5lb/bg","stock":2144,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74304","name_en":"(Lucky)Thin Wonton Skin 1lb/bg","name_cn":"(美味)玻璃皮 1lb/bg","stock":577,"unit":"1lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74311","name_en":"(Golden Bowl) Thin Wonton Skin 1lb/pack","name_cn":"玻璃皮(金碗) 1lb/bg","stock":2388,"unit":"1lb/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74500","name_en":"(GT) Dumpling Skin 45X1lb","name_cn":"(真味)水饺皮45X1lb","stock":201,"unit":"45lb/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74502","name_en":"GT Dumpling Skin 1lb","name_cn":"(真味)水饺皮 1lb","stock":207,"unit":"1lb/cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74600","name_en":"(Spring Home)Spring roll Skin 40x25pc/cs","name_cn":"(第一家)上海春卷皮 40x25pc/cs","stock":211,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74601","name_en":"(Spring Home)Spring roll Skin 25pc/pack","name_cn":"(第一家)上海春卷皮 25pc/pack","stock":104,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74610","name_en":"(Wei Chuan)Spring roll Skin 40x25pc/cs","name_cn":"(味全)上海春卷皮 40x25pc/cs","stock":66,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74611","name_en":"(Wei Chuan)Spring roll Skin 25pc/pack","name_cn":"(味全)上海春卷皮 25pc/pack","stock":122,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74618","name_en":"(Wei Chuan) Moo Shu Skin 36X12pc/cs","name_cn":"味全木須皮   36X12pc/cs","stock":69,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74621","name_en":"(Wei Chuan) Moo Shu Skin 12pc/cs","name_cn":"味全木須皮 12pc/cs","stock":70,"unit":"pk","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74628","name_en":"Affinity 2oz Chicken Eggroll 120pcs","name_cn":"亚辉2oz 鸡肉春卷120条","stock":156,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74631","name_en":"BaiLy Eggroll3oz 96pc/cs","name_cn":"百利春卷3oz 96pc/cs","stock":750,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74632","name_en":"Baily 2oz Eggroll 120pc/cs","name_cn":"百利春卷2oz 120pc/cs","stock":674,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74635","name_en":"Affinity 2oz Eggroll 15lb","name_cn":"亚辉春卷2oz 15lb","stock":450,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74638","name_en":"Affinity 3oz Eggroll 18lb","name_cn":"亚辉春卷3oz 18lb","stock":458,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74700","name_en":"Golden Bowl Fortune Cookie","name_cn":"签语饼(金)","stock":2047,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74705","name_en":"Rose Fortune Cookie","name_cn":"签语饼(玫瑰花)","stock":725,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74710","name_en":"Golden Bowl Crispy Noodle 10lb/cs","name_cn":"面干(金)","stock":194,"unit":"cs","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"74805","name_en":"(TG) Thin Noodle 5lb/bg","name_cn":"细面(美) 5lb/bg","stock":543,"unit":"5lb/bg","cat_cn":"🌾 粮油面点","cat_en":"🌾 Grains & Noodles"},{"code":"80004","name_en":"Soap Powder 50lb/pail","name_cn":"砚粉(桶装) 50lb/桶","stock":757,"unit":"bkt","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80010","name_en":"LYE (Sodium Hydroxide Powder) 12cn/cs","name_cn":"LYE 碱粉","stock":160,"unit":"12cn/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80100","name_en":"Bleach","name_cn":"漂白水","stock":780,"unit":"bkt","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80115","name_en":"(Be-Clean) Green Detergent 4X1GAL","name_cn":"洗洁精(绿)Be Clean Detergent 4X1GA","stock":492,"unit":"4bkt/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80125","name_en":"(Be-Clean) Heavy Duty Oven&Grill Cleaner 4X1GAL","name_cn":"强力炉头水(Be-Clean) 4x1GAL/cs","stock":165,"unit":"btl","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80127","name_en":"(Be-Clean) Pink Detergent 4X1GAL","name_cn":"洗洁精(红)Be Clean Detergent4X1GAL","stock":140,"unit":"4bkt/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80130","name_en":"Cement","name_cn":"炉头土(桶)","stock":2,"unit":"bkt","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"80138","name_en":"Oven Cleaner (Kitchen Essentials) 4x1GL /cs","name_cn":"强力炉头水(Kitchen Essentials) 4x1G","stock":136,"unit":"4bkt/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81000","name_en":"Mop(pc)","name_cn":"地拖布(块）","stock":76,"unit":"pc","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81001","name_en":"Mop12/cs","name_cn":"地拖布12pc/箱","stock":9,"unit":"12pc/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81010","name_en":"Wok Brush (unit)","name_cn":"洗锅刷(支)","stock":12,"unit":"pc","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81011","name_en":"Wok Brush 12/cs","name_cn":"洗锅刷  12/cs","stock":46,"unit":"12pc/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81020","name_en":"Deck Brush (unit)","name_cn":"炉头刷 (unit)","stock":9,"unit":"pc","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81021","name_en":"Deck Brush 12/cs","name_cn":"炉头刷 12/cs","stock":7,"unit":"12pc/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81030","name_en":"Deck B. Handle (unit)","name_cn":"炉头柄 (把)","stock":45,"unit":"pc","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81040","name_en":"Mop Handle （unit)","name_cn":"地拖柄(把)","stock":9,"unit":"pc","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81060","name_en":"Chefins Hat(100pc)/box","name_cn":"厨帽(100pc)/box","stock":1,"unit":"100pc/bx","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81061","name_en":"Chefins Hat(10x100pc)/box","name_cn":"厨帽(10x100pc)/box","stock":3,"unit":"10bx/cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81110","name_en":"Taiwan S. Sponge-10bx/case","name_cn":"铁丝清洁球(台湾) -10盒/箱","stock":95,"unit":"cs","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"81112","name_en":"Taiwan S. Sponge-10pcs/box","name_cn":"铁丝清洁球(台湾) 10pc/盒","stock":178,"unit":"10pc/bx","cat_cn":"🧹 卫生用品","cat_en":"🧹 Cleaning"},{"code":"85010","name_en":"Calendar","name_cn":"挂历","stock":29,"unit":"pc","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"85060","name_en":"Paper Box  12x12x18","name_cn":"空纸箱 12x12x18","stock":4000,"unit":"pc","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"85111","name_en":"Hand Truck wheel","name_cn":"小推车轮","stock":18,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"85112","name_en":"Ball Bearing","name_cn":"轴承  5/8","stock":17,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"85115","name_en":"Oder form","name_cn":"出货单","stock":175,"unit":"cs","cat_cn":"🥫 罐头干货","cat_en":"🥫 Canned & Dry"},{"code":"92617","name_en":"Biscuit 24cn/cs","name_cn":"炸包 24罐/箱","stock":134,"unit":"24cn/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92620","name_en":"Garlic Breadc 125pc","name_cn":"烤面包","stock":124,"unit":"cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92628","name_en":"(B 14) Steam Bun","name_cn":"小馒头","stock":27,"unit":"6bg/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92630","name_en":"(HF) Spring roll 200pcx50g","name_cn":"(第一)上海素春卷200条","stock":149,"unit":"200pc/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92670","name_en":"(Gourmet King 25gx400pc/cs Spring roll","name_cn":"(金康GK25gx400 l/箱)上海素春卷","stock":837,"unit":"400pc/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92672","name_en":"(Gourmet King) 50gx200pc/cs Spring roll","name_cn":"(金康GK50gx200 l/箱)上海素春卷","stock":1103,"unit":"200pc/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92675","name_en":"(Wei chuan) 200pc Veg Spring roll","name_cn":"(味全)上海素春卷200条","stock":165,"unit":"200pc/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92676","name_en":"Vegetable Dumpling 12X1.5LB(50pcs)","name_cn":"素鍋貼12X1.5LB(50pcs)","stock":2,"unit":"12bg/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92690","name_en":"(HF) Spring roll 400pcx25g","name_cn":"(第一)上海素春卷400条","stock":109,"unit":"400pc/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92694","name_en":"Custard  Bun 30gx20bgx6","name_cn":"奶黄包(B 07) 30gx20个x6包/cs","stock":121,"unit":"6bg/cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"92845","name_en":"(Baily) 3oz shrimp eggroll 96pc","name_cn":"(百利)3oz虾春卷96pc/cs","stock":23,"unit":"cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99000","name_en":"A Cream Jelly roll","name_cn":"A蛋糕/奶油蛋卷","stock":285,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99001","name_en":"A8 Cream Jelly roll","name_cn":"A8蛋糕/ACC奶油蛋卷","stock":71,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99002","name_en":"AA Swiss  roll","name_cn":"AA蛋糕/ACC虎皮蛋卷","stock":341,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99012","name_en":"AD8 Japanese Pineapple Pastry","name_cn":"AD8/日式ACC小酥饼","stock":131,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99100","name_en":"AJ Chocolate Brownie","name_cn":"AJ 蛋糕/朱古力","stock":65,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99101","name_en":"Q8 Mocha(Coffee)","name_cn":"Q8蛋糕/ACC咖啡慕思","stock":78,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99103","name_en":"Q Cake - Tiramisu Mousse","name_cn":"Q蛋糕-提拉米苏","stock":7,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99111","name_en":"C8 Coconut Mousse Cake","name_cn":"C8蛋糕/椰丝毛士","stock":149,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99121","name_en":"D8 Strawberry Cake","name_cn":"D8蛋糕/ACC草莓","stock":94,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99140","name_en":"G Carrot Cake","name_cn":"G蛋糕/核桃红萝卜","stock":40,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99150","name_en":"H Coconut Cake","name_cn":"H蛋糕/椰丝","stock":123,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99160","name_en":"J Black Forest Cake","name_cn":"J 蛋糕/黑森林","stock":148,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99161","name_en":"J8 Black Forest Cake","name_cn":"J 8蛋糕/ACC黑森林","stock":160,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99170","name_en":"T Brownie","name_cn":"T蛋糕/幻彩朱古力","stock":41,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99200","name_en":"B Milkflake","name_cn":"B蛋糕/千层酥","stock":128,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99210","name_en":"P Palm Leaf","name_cn":"P 蛋糕 蝴蝶酥","stock":287,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99211","name_en":"P8 Palm Leaf","name_cn":"P 8蛋糕 ACC蝴蝶酥","stock":133,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99212","name_en":"NP Cake - Napolean (40pcs)","name_cn":"NP- 拿破仑蛋糕","stock":94,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99220","name_en":"U Butter Crisp","name_cn":"U蛋糕 牛油酥","stock":106,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99230","name_en":"V Coconut Macaroon","name_cn":"V 蛋糕/椰蓉酥","stock":337,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99231","name_en":"V8 Cake/ACC Coconut Macaroon","name_cn":"V8 蛋糕/ACC椰蓉酥","stock":74,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99232","name_en":"VM Matcha Coconut Macaroon","name_cn":"VM 蛋糕 - 抹茶椰酥","stock":22,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99241","name_en":"Y Mini Bundt Cakes","name_cn":"Y蛋糕/迷你小圈圈","stock":337,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99310","name_en":"M Round Puff","name_cn":"M 蛋糕/圆巴夫","stock":89,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99320","name_en":"O Long Puff","name_cn":"O蛋糕/长巴夫","stock":288,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99330","name_en":"PS Puff","name_cn":"PS蛋糕/开口巴夫","stock":110,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99331","name_en":"PS8 Puff","name_cn":"PS8蛋糕/ACC开口巴夫","stock":148,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99500","name_en":"W Mango Mousse Cake","name_cn":"W蛋糕/芒果慕思","stock":120,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99501","name_en":"W8 Mango Mousse Cake","name_cn":"W8 蛋糕/ACC芒果慕思","stock":72,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99510","name_en":"L Mocha Mousse Cake","name_cn":"L 蛋糕/咖啡慕思","stock":1018,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99511","name_en":"L8 Cake/Mocha Mousse Cake","name_cn":"L8蛋糕/ACC咖啡慕思","stock":579,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99520","name_en":"K Raspberry Mousse Cake","name_cn":"K 蛋糕/红莓慕思","stock":299,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99526","name_en":"3 Strawberry Mousse","name_cn":"3 蛋糕/草莓慕思","stock":376,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99527","name_en":"4 Mint Mousse","name_cn":"4蛋糕/薄荷慕思","stock":59,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99528","name_en":"5 Chocolate Mousse","name_cn":"5蛋糕/巧克力慕思","stock":128,"unit":"cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99605","name_en":"CR Double layer Salted Caramel Cake","name_cn":"CR 雙層焦鹽蛋糕","stock":48,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99617","name_en":"10 inOREOinChocolateCake","name_cn":"10 奥利奥饼干蛋糕","stock":362,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99650","name_en":"CD Cheese Cake 3 Pc","name_cn":"CD 芝士蛋糕","stock":146,"unit":"cs","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"},{"code":"99658","name_en":"CD11 Cheese Cake","name_cn":"11 圆芝士蛋糕","stock":240,"unit":"bx","cat_cn":"🎂 点心糕点","cat_en":"🎂 Pastries & Dim Sum"}];
+var CUSTS = [];
+
+/* ========== i18n ========== */
+var LANG = 'zh';
+var I18N = {
+  zh: {
+    title: 'HF Foods Atlanta',
+    sub: '',
+    search: '搜索产品',
+    all: '全部',
+    oos: '缺货',
+    stock: '库存',
+    low: '库存紧张',
+    in_stock: '现货',
+    cart_n: '购物车 / Cart: %n',
+    checkout: '发送 / Send',
+    cart_title: '购物车',
+    to_checkout: '去结账',
+    co_title: '结账',
+    lab_id: '客户编号（可选）',
+    lab_id_required: '客户编号',
+    lab_method: '取货方式',
+    opt_pickup: '自取',
+    opt_delivery: '送货',
+    pickup_hint: '自取无需客户编号',
+    delivery_hint: '送货仅限已开户客户，请填写客户编号',
+    lab_name: '餐馆名称',
+    lab_phone: '联系电话',
+    lab_contact: '联系人',
+    lab_email: '邮箱',
+    lab_date: '送货日期',
+    lab_note: '备注',
+    lookup: '查询',
+    submit: '提交订单',
+    req: '*',
+    ph_id: '输入编号',
+    ph_email: 'name@example.com',
+    ph_search: '搜索产品名称/编号',
+    ph_note: '其他备注（可选）',
+    cart_empty: '购物车还是空的',
+    need_method: '请选择取货方式',
+    need_name: '请填写餐馆名称',
+    need_phone: '请填写联系电话',
+    need_phone_10: '联系电话必须是 10 位数字',
+    need_contact: '请填写联系人',
+    need_email: '请填写邮箱',
+    need_email_valid: '邮箱格式不正确',
+    need_id_delivery: '送货需要填写客户编号（仅限已开户客户）',
+    cart_empty_err: '购物车为空',
+    sending: '提交中...',
+    send_ok: '订单已提交！我们会尽快与您联系。',
+    send_fail: '提交失败，请稍后重试或联系客服',
+    cust_found: '已找到客户：',
+    cust_none: '未找到该客户编号，您可直接填写下方信息',
+    unit: '单位',
+  },
+  en: {
+    title: 'HF Foods Atlanta',
+    sub: '',
+    search: 'Search products',
+    all: 'All',
+    oos: 'OUT OF STOCK',
+    stock: 'Stock',
+    low: 'LOW STOCK',
+    in_stock: 'In Stock',
+    cart_n: '购物车 / Cart: %n',
+    checkout: '发送 / Send',
+    cart_title: 'Cart',
+    to_checkout: 'Checkout',
+    co_title: 'Checkout',
+    lab_id: 'Customer ID (optional)',
+    lab_id_required: 'Customer ID',
+    lab_method: 'Order Type',
+    opt_pickup: 'Pickup',
+    opt_delivery: 'Delivery',
+    pickup_hint: 'No account needed for pickup',
+    delivery_hint: 'Delivery is for account holders only. Please enter your Customer ID.',
+    lab_name: 'Restaurant Name',
+    lab_phone: 'Phone',
+    lab_contact: 'Contact Person',
+    lab_email: 'Email',
+    lab_date: 'Delivery Date',
+    lab_note: 'Note',
+    lookup: 'Lookup',
+    submit: 'Submit Order',
+    req: '*',
+    ph_id: 'Enter ID',
+    ph_email: 'name@example.com',
+    ph_search: 'Search name or code',
+    ph_note: 'Other notes (optional)',
+    cart_empty: 'Your cart is empty',
+    need_method: 'Please select an order type',
+    need_name: 'Please enter restaurant name',
+    need_phone: 'Please enter phone number',
+    need_phone_10: 'Phone number must be exactly 10 digits',
+    need_contact: 'Please enter contact person',
+    need_email: 'Please enter your email',
+    need_email_valid: 'Email format is invalid',
+    need_id_delivery: 'Customer ID is required for delivery (account holders only)',
+    cart_empty_err: 'Cart is empty',
+    sending: 'Submitting...',
+    send_ok: 'Order submitted! We will contact you soon.',
+    send_fail: 'Failed to submit. Please retry or contact support.',
+    cust_found: 'Customer found: ',
+    cust_none: 'Customer ID not found. You can fill in the info below directly.',
+    unit: 'Unit',
+  }
+};
+
+function t(k) { return (I18N[LANG] && I18N[LANG][k]) || k; }
+
+/* ========== STATE ========== */
+var AC = '__ALL__';
+var SQ = '';
+var cart = {};
+var PRODS_BY_CODE = {};
+for (var i = 0; i < PRODS.length; i++) { PRODS_BY_CODE[PRODS[i].code] = PRODS[i]; }
+
+/* ========== EmailJS config ========== */
+var EJS_PUB = 'nSA2bpv8rwZ8i3Xh5';
+var EJS_SVC = 'service_yozsihv';
+var EJS_TPL = 'template_bh2i2ua';
+
+/* ========== RENDER ========== */
+function buildTabs() {
+  var tabs = document.getElementById('tabs');
+  var html = '<button class="tab' + (AC === '__ALL__' ? ' on' : '') + '" data-cat="__ALL__">' + t('all') + '</button>';
+  for (var i = 0; i < CATS.length; i++) {
+    var c = CATS[i];
+    var label = (LANG === 'zh') ? c.cn : c.en;
+    html += '<button class="tab' + (AC === c.cn ? ' on' : '') + '" data-cat="' + escAttr(c.cn) + '">' + escHtml(label) + '</button>';
+  }
+  tabs.innerHTML = html;
+  var btns = tabs.querySelectorAll('.tab');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].onclick = function() {
+      AC = this.getAttribute('data-cat');
+      buildTabs();
+      renderList();
+    };
+  }
+}
+
+function renderList() {
+  var list = document.getElementById('list');
+  var sq = SQ.trim().toLowerCase();
+  var groups = {};
+  var groupOrder = [];
+  for (var i = 0; i < PRODS.length; i++) {
+    var p = PRODS[i];
+    if (AC !== '__ALL__' && p.cat_cn !== AC) continue;
+    if (sq) {
+      var hay = (p.code + ' ' + p.name_en + ' ' + p.name_cn).toLowerCase();
+      if (hay.indexOf(sq) < 0) continue;
+    }
+    var gk = p.cat_cn;
+    if (!groups[gk]) { groups[gk] = []; groupOrder.push(gk); }
+    groups[gk].push(p);
+  }
+  var total = 0;
+  for (var k in groups) total += groups[k].length;
+  if (total === 0) {
+    list.innerHTML = '<div class="empty">' + (LANG === 'zh' ? '没有匹配的产品' : 'No matching products') + '</div>';
+    return;
+  }
+  var out = '';
+  for (var gi = 0; gi < groupOrder.length; gi++) {
+    var g = groupOrder[gi];
+    var label = g;
+    for (var ci = 0; ci < CATS.length; ci++) {
+      if (CATS[ci].cn === g) { label = (LANG === 'zh') ? CATS[ci].cn : CATS[ci].en; break; }
+    }
+    out += '<div style="padding:8px 12px 4px;font-size:12px;font-weight:700;color:#166534;background:#f0fdf4">' + escHtml(label) + ' (' + groups[g].length + ')</div>';
+    out += '<div class="pgrid">';
+    for (var pi = 0; pi < groups[g].length; pi++) {
+      out += makeCard(groups[g][pi]);
+    }
+    out += '</div>';
+  }
+  list.innerHTML = out;
+  bindCardBtns();
+}
+
+function makeCard(p) {
+  var name = (LANG === 'zh') ? (p.name_cn || p.name_en) : (p.name_en || p.name_cn);
+  var isOos = (p.stock <= 0);
+  var isLow = (p.stock > 0 && p.stock < 10);
+  var qty = (cart[p.code] && cart[p.code].qty) || 0;
+  var stockTxt = '';
+  var stockCls = 'pc-stock';
+  if (isOos) {
+    stockTxt = t('oos');
+    stockCls = 'pc-stock oos';
+  } else if (isLow) {
+    stockTxt = t('low');
+    stockCls = 'pc-stock low';
+  } else {
+    stockTxt = t('in_stock');
+  }
+  var h = '<div class="pc' + (isOos ? ' oos' : '') + '" data-code="' + escAttr(p.code) + '">';
+  if (isOos) {
+    h += '<span class="pc-oos-badge">' + t('oos') + '</span>';
+  }
+  h += '<div class="pc-code">[' + escHtml(p.code) + ']</div>';
+  h += '<div class="pc-name">' + escHtml(name) + '</div>';
+  h += '<div class="pc-unit">' + escHtml(p.unit || '') + '</div>';
+  h += '<div class="' + stockCls + '">' + escHtml(stockTxt) + '</div>';
+  h += '<div class="qty-row">';
+  if (isOos) {
+    h += '<button class="qty-btn disabled" disabled>-</button>';
+    h += '<span class="qty-val zero">0</span>';
+    h += '<button class="qty-btn disabled" disabled>+</button>';
+  } else {
+    h += '<button class="qty-btn qb-minus" data-code="' + escAttr(p.code) + '">-</button>';
+    h += '<span class="qty-val' + (qty === 0 ? ' zero' : '') + '">' + qty + '</span>';
+    h += '<button class="qty-btn qb-plus" data-code="' + escAttr(p.code) + '">+</button>';
+  }
+  h += '</div></div>';
+  return h;
+}
+
+function bindCardBtns() {
+  var plusBtns = document.querySelectorAll('.qb-plus');
+  for (var i = 0; i < plusBtns.length; i++) {
+    plusBtns[i].onclick = function(e) {
+      e.stopPropagation();
+      chq(this.getAttribute('data-code'), 1);
+    };
+  }
+  var minusBtns = document.querySelectorAll('.qb-minus');
+  for (var j = 0; j < minusBtns.length; j++) {
+    minusBtns[j].onclick = function(e) {
+      e.stopPropagation();
+      chq(this.getAttribute('data-code'), -1);
+    };
+  }
+}
+
+function chq(code, delta) {
+  var p = PRODS_BY_CODE[code];
+  if (!p || p.stock <= 0) return;
+  var cur = (cart[code] && cart[code].qty) || 0;
+  var next = cur + delta;
+  if (next < 0) next = 0;
+  if (next > p.stock) next = p.stock;
+  if (next === 0) {
+    delete cart[code];
+  } else {
+    cart[code] = { product: p, qty: next };
+  }
+  // Update only the affected card if possible
+  var card = document.querySelector('.pc[data-code="' + code + '"]');
+  if (card) {
+    var valEl = card.querySelector('.qty-val');
+    if (valEl) {
+      valEl.textContent = next;
+      if (next === 0) valEl.classList.add('zero'); else valEl.classList.remove('zero');
+    }
+  }
+  updateCartBar();
+}
+
+function updateCartBar() {
+  var count = 0;
+  for (var k in cart) count += cart[k].qty;
+  var txt = t('cart_n').replace('%n', count);
+  document.getElementById('cartTxt').textContent = txt;
+  var dis = (count === 0);
+  document.getElementById('coBtn').disabled = dis;
+}
+
+function openCart() {
+  renderCartModal();
+  document.getElementById('mCart').classList.add('show');
+}
+
+function renderCartModal() {
+  var body = document.getElementById('mCartBody');
+  var codes = [];
+  for (var k in cart) codes.push(k);
+  if (codes.length === 0) {
+    body.innerHTML = '<div class="empty">' + t('cart_empty') + '</div>';
+    document.getElementById('mCartCheckout').disabled = true;
+    return;
+  }
+  document.getElementById('mCartCheckout').disabled = false;
+  var out = '';
+  for (var i = 0; i < codes.length; i++) {
+    var it = cart[codes[i]];
+    var p = it.product;
+    var name = (LANG === 'zh') ? (p.name_cn || p.name_en) : (p.name_en || p.name_cn);
+    out += '<div class="ci-row">';
+    out += '<div class="ci-name">' + escHtml(name) + ' <span class="ci-unit">(' + escHtml(p.unit || '') + ')</span></div>';
+    out += '<div class="ci-qty">';
+    out += '<button class="qty-btn cm-minus" data-code="' + escAttr(p.code) + '">-</button>';
+    out += '<span class="qty-val" style="min-width:24px">' + it.qty + '</span>';
+    out += '<button class="qty-btn cm-plus" data-code="' + escAttr(p.code) + '">+</button>';
+    out += '<button class="ci-del cm-del" data-code="' + escAttr(p.code) + '">🗑</button>';
+    out += '</div></div>';
+  }
+  body.innerHTML = out;
+  var mp = body.querySelectorAll('.cm-plus');
+  for (var a = 0; a < mp.length; a++) mp[a].onclick = function() { chq(this.getAttribute('data-code'), 1); renderCartModal(); };
+  var mm = body.querySelectorAll('.cm-minus');
+  for (var b = 0; b < mm.length; b++) mm[b].onclick = function() { chq(this.getAttribute('data-code'), -1); renderCartModal(); };
+  var md = body.querySelectorAll('.cm-del');
+  for (var c = 0; c < md.length; c++) md[c].onclick = function() { delete cart[this.getAttribute('data-code')]; renderCartModal(); updateCartBar(); renderList(); };
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+function checkout() {
+  var count = 0;
+  for (var k in cart) count += cart[k].qty;
+  if (count === 0) return;
+  closeModal('mCart');
+  document.getElementById('mCo').classList.add('show');
+  document.getElementById('msgErr').classList.remove('show');
+  document.getElementById('msgOk').classList.remove('show');
+}
+
+function onMethodChange() {
+  var radios = document.getElementsByName('fmethod');
+  var v = '';
+  for (var i = 0; i < radios.length; i++) { if (radios[i].checked) { v = radios[i].value; break; } }
+  var hint = document.getElementById('methodHint');
+  var labId = document.getElementById('labId');
+  var pBox = document.getElementById('optPickupBox');
+  var dBox = document.getElementById('optDeliveryBox');
+  pBox.classList.toggle('active', v === 'pickup');
+  dBox.classList.toggle('active', v === 'delivery');
+  hint.classList.remove('show', 'pickup', 'delivery');
+  if (v === 'pickup') {
+    hint.textContent = t('pickup_hint');
+    hint.classList.add('show', 'pickup');
+    labId.innerHTML = t('lab_id');
+  } else if (v === 'delivery') {
+    hint.textContent = t('delivery_hint');
+    hint.classList.add('show', 'delivery');
+    labId.innerHTML = t('lab_id_required') + ' <span class="req">*</span>';
+  } else {
+    labId.innerHTML = t('lab_id');
+  }
+}
+
+function setLang(lang) {
+  LANG = lang;
+  document.documentElement.lang = (lang === 'zh') ? 'zh' : 'en';
+  // headers
+  document.getElementById('titleMain').textContent = t('title');
+  document.getElementById('sq').placeholder = t('ph_search');
+  document.getElementById('mCartTitle').textContent = t('cart_title');
+  document.getElementById('mCoTitle').textContent = t('co_title');
+  document.getElementById('mCartCheckout').textContent = t('to_checkout');
+  document.getElementById('btnSend').textContent = t('submit');
+  document.getElementById('fid').placeholder = t('ph_id');
+  document.getElementById('fnote').placeholder = t('ph_note');
+  document.getElementById('femail').placeholder = t('ph_email');
+  // labels
+  document.getElementById('labMethod').innerHTML = t('lab_method') + ' <span class="req">*</span>';
+  document.getElementById('optPickup').textContent = t('opt_pickup');
+  document.getElementById('optDelivery').textContent = t('opt_delivery');
+  document.getElementById('labName').innerHTML = t('lab_name') + ' <span class="req">*</span>';
+  document.getElementById('labPhone').innerHTML = t('lab_phone') + ' <span class="req">*</span>';
+  document.getElementById('labContact').innerHTML = t('lab_contact') + ' <span class="req">*</span>';
+  document.getElementById('labEmail').innerHTML = t('lab_email') + ' <span class="req">*</span>';
+  document.getElementById('labNote').innerHTML = t('lab_note');
+  onMethodChange();
+  buildTabs();
+  renderList();
+  updateCartBar();
+  renderCartModal();
+}
+
+/* ========== Order send ========== */
+var _ejsLoaded = false;
+function loadEJS(cb) {
+  if (_ejsLoaded && window.emailjs) { cb(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js';
+  s.onload = function() {
+    _ejsLoaded = true;
+    try { emailjs.init(EJS_PUB); } catch (e) {}
+    cb();
+  };
+  s.onerror = function() { cb(new Error('ejs load fail')); };
+  document.head.appendChild(s);
+}
+
+/*
+  Order number format: 7 digits   Y MM DD NN
+   - Y  = last digit of year (2026 → 6)
+   - MM = 01-12
+   - DD = 01-31
+   - NN = today's sequential order count 01-99 (shared across all customers/devices)
+  Uses a free atomic-counter service (abacus.jasoncameron.dev) to produce a
+  global count per day-key. Falls back to localStorage count per device, then
+  a random 2-digit if everything fails.
+*/
+function pad2(n) { return (n < 10 ? '0' : '') + n; }
+function todayKey() {
+  var d = new Date();
+  var y = d.getFullYear() % 10;
+  var m = d.getMonth() + 1;
+  var day = d.getDate();
+  return '' + y + pad2(m) + pad2(day);  // 5-digit: YMMDD  e.g. "60420"
+}
+function genRef(cb) {
+  var prefix = todayKey();
+  var done = false;
+  function finalize(countVal) {
+    if (done) return;
+    done = true;
+    var c = parseInt(countVal, 10);
+    if (!c || isNaN(c) || c < 1) {
+      try {
+        var lk = 'hfa_cnt_' + prefix;
+        var lc = parseInt(localStorage.getItem(lk) || '0', 10) + 1;
+        localStorage.setItem(lk, String(lc));
+        c = lc;
+      } catch (e) {
+        c = Math.floor(Math.random() * 99) + 1;
+      }
+    }
+    var nn = c % 100;
+    if (nn === 0) nn = 1;
+    cb(prefix + pad2(nn));
+  }
+  // Hard timeout so UI never hangs if the counter service is slow/blocked
+  setTimeout(function() { finalize(null); }, 3500);
+  try {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', 'https://abacus.jasoncameron.dev/hit/hf-foods-atl/' + prefix, true);
+    xhr.onload = function() {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          var data = JSON.parse(xhr.responseText);
+          finalize(data && (data.value || data.count));
+        } catch (e) { finalize(null); }
+      } else {
+        finalize(null);
+      }
+    };
+    xhr.onerror = function() { finalize(null); };
+    xhr.send();
+  } catch (e) {
+    finalize(null);
+  }
+}
+
+function buildBody() {
+  var lines = [];
+  var total = 0;
+  var codes = [];
+  for (var k in cart) codes.push(k);
+  for (var i = 0; i < codes.length; i++) {
+    var it = cart[codes[i]];
+    var p = it.product;
+    // Parse unit: "40lb/cs" -> spec "40lb" + count_unit "cs"; "lbs" -> count_unit "lbs"
+    var u = (p.unit || '').trim();
+    var spec = '', cu = '';
+    var slash = u.indexOf('/');
+    if (slash > -1) { spec = u.substring(0, slash).trim(); cu = u.substring(slash + 1).trim(); }
+    else { cu = u; }
+    var qtyPart = it.qty + (cu ? ' ' + cu : '');
+    var line = '[' + p.code + '] [' + qtyPart + ']';
+    if (spec) line += ' [' + spec + ']';
+    line += ' ' + (p.name_cn || '') + ' / ' + (p.name_en || '');
+    lines.push(line);
+    total += it.qty;
+  }
+  return { body: lines.join('\n'), count: codes.length, total: total };
+}
+
+function sendOrder() {
+  var name = document.getElementById('fname').value.trim();
+  var phone = document.getElementById('fphone').value.trim();
+  var contact = document.getElementById('fcontact').value.trim();
+  var email = document.getElementById('femail').value.trim();
+  var fid = document.getElementById('fid').value.trim();
+  var radios = document.getElementsByName('fmethod');
+  var methodVal = '';
+  for (var mi = 0; mi < radios.length; mi++) { if (radios[mi].checked) { methodVal = radios[mi].value; break; } }
+  var err = document.getElementById('msgErr');
+  var ok = document.getElementById('msgOk');
+  err.classList.remove('show'); ok.classList.remove('show');
+  if (!methodVal) { err.textContent = t('need_method'); err.classList.add('show'); return; }
+  if (!name) { err.textContent = t('need_name'); err.classList.add('show'); return; }
+  if (!phone) { err.textContent = t('need_phone'); err.classList.add('show'); return; }
+  var phoneDigits = phone.replace(/\D/g, '');
+  if (phoneDigits.length !== 10) { err.textContent = t('need_phone_10'); err.classList.add('show'); return; }
+  if (!contact) { err.textContent = t('need_contact'); err.classList.add('show'); return; }
+  if (!email) { err.textContent = t('need_email'); err.classList.add('show'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = t('need_email_valid'); err.classList.add('show'); return; }
+  if (methodVal === 'delivery' && !fid) { err.textContent = t('need_id_delivery'); err.classList.add('show'); return; }
+  var methodLabel = (methodVal === 'pickup') ? '自取 / Pickup' : '送货 / Delivery';
+  var info = buildBody();
+  if (info.count === 0) { err.textContent = t('cart_empty_err'); err.classList.add('show'); return; }
+
+  var btn = document.getElementById('btnSend');
+  btn.disabled = true;
+  btn.textContent = t('sending');
+
+  genRef(function(orderRef) {
+  // Prepend the order number + key fields so they're always visible in Gmail body
+  var bodyWithRef = '订单号 / Order #: ' + orderRef + '\n'
+                  + '取货方式 / Order Type: ' + methodLabel + '\n'
+                  + '客户编号 / Customer ID: ' + (fid || '(无 / N/A)') + '\n'
+                  + '餐馆 / Restaurant: ' + name + '\n'
+                  + '联系人 / Contact: ' + contact + '\n'
+                  + '电话 / Phone: ' + phone + '\n'
+                  + '邮箱 / Email: ' + email + '\n'
+                  + '====================================\n'
+                  + info.body;
+
+  loadEJS(function(e) {
+    if (e) {
+      err.textContent = t('send_fail');
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = t('submit');
+      return;
+    }
+    var params = {
+      to_email: 'HFFoodsATL@gmail.com',
+      order_ref: orderRef,
+      customer_id: fid,
+      customer_name: name,
+      customer_email: email,
+      route: methodLabel,
+      order_type: methodLabel,
+      delivery_date: '',
+      item_count: info.count,
+      total_qty: info.total,
+      order_body: bodyWithRef,
+      note: document.getElementById('fnote').value,
+      phone: phone,
+      contact: contact,
+      date: new Date().toLocaleString()
+    };
+    emailjs.send(EJS_SVC, EJS_TPL, params).then(function() {
+      // Show success with prominent order number for the customer
+      ok.innerHTML = t('send_ok')
+        + '<div style="margin-top:8px;padding:8px 10px;background:#fff;border:1px dashed #16a34a;border-radius:5px;font-size:13px;color:#166534;font-weight:700;text-align:center">'
+        + '订单号 / Order #<br><span style="font-size:16px;letter-spacing:.5px">' + escHtml(orderRef) + '</span>'
+        + '</div>';
+      ok.classList.add('show');
+      err.classList.remove('show');
+      cart = {};
+      updateCartBar();
+      renderList();
+      renderCartModal();
+      setTimeout(function() { closeModal('mCo'); }, 6000);
+      btn.disabled = false;
+      btn.textContent = t('submit');
+    }, function() {
+      err.textContent = t('send_fail');
+      err.classList.add('show');
+      btn.disabled = false;
+      btn.textContent = t('submit');
+    });
+  });
+  });
+}
+
+/* ========== Utils ========== */
+function escHtml(s) {
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+function escAttr(s) {
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* ========== Init ========== */
+document.getElementById('sq').addEventListener('input', function(e) {
+  SQ = e.target.value;
+  renderList();
+});
+// Language is fixed per file (zh in index.html, en in en.html).
+// setLang() already triggers buildTabs / renderList / updateCartBar internally.
+setLang(LANG);
+</script>
+</body>
+</html>
